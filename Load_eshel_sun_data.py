@@ -25,7 +25,7 @@ from tqdm import tqdm
     
     # For example if you would like the flux of the object in order 3:
 
-
+main_folder = r'C:\Users\Ralfy\OneDrive - UvA\Natuur- & Sterrenkunde Bachelor\2e Jaar\NSP2 & ECPC\NSP2\Flux_raw_sunLimbA\Flux_raw_sunLimbA'
 
 N_order = 3
 data_order_N = np.loadtxt(os.path.join(main_folder, "data_raw_order_{}.csv").format(N_order),  delimiter=',')
@@ -55,13 +55,24 @@ plt.show()
 
 wavelength_list =   [6677.2817,
                      6538.1120,
-                     6583.9059]
+                     6583.9059, 
+                     6604.8534,
+                     6591.4845,
+                     6588.5396,
+                     6554.1603]
 
 x_list =            [1752,
                      4656,
-                     3747]
+                     3747,
+                     3319,
+                     3594,
+                     3654,
+                     4343]
 
 uncertainty_x =     [0.5,
+                     0.5,
+                     0.5,
+                     0.5,
                      0.5,
                      0.5]
 
@@ -108,12 +119,12 @@ fig.subplots_adjust(hspace=0)
 ax1.set_title("Wavelength calibration fit (x-pixels vs wavelength)")
 ax1.plot(x_pixelvalues, wavelength_object)
 ax1.set_ylabel("Wavelength [Angstrom]")
-ax1.errorbar(x_list, wavelength_list, yerr=uncertainty_x*np.array(fit_1[1]), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
+ax1.errorbar(x_list, wavelength_list, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 ax1.scatter(x_list,wavelength_list, c='blue')
 
 
 
-ax2.errorbar(x_list, residuals, yerr=uncertainty_x*np.array(fit_1[1]), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
+ax2.errorbar(x_list, residuals, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 ax2.scatter(x_list,residuals)
 ax2.set_ylabel("Pixels")
 ax2.set_ylabel("Residuals [Angstrom]")

@@ -59,17 +59,40 @@ wavelength_list =   [6677.2817,
                      6604.8534,
                      6591.4845,
                      6588.5396,
-                     6554.1603]
+                     6554.1603,
+                     6577.2145,
+                     6684.2930,
+                     6666.3589,
+                     6664.0510,
+                     6662.2686,
+                     6660.6762,
+                     6643.6976]
 
 x_list =            [1752,
                      4656,
-                     3747,
+#hoogste punt        3747,
+                     3748,                    
                      3319,
                      3594,
                      3654,
-                     4343]
+                     4343,
+                     3883,
+                     1592,
+                     1997,
+                     2048,
+                     2088,
+                     2124,
+                     2496]
 
 uncertainty_x =     [0.5,
+                     0.5,
+                     0.5,
+                     0.5,
+                     0.5,
+                     0.5,
+                     0.5,
+                     0.5,
+                     0.5,
                      0.5,
                      0.5,
                      0.5,
@@ -86,7 +109,8 @@ plt.show()
 
 # %% Polynomial fit for wavelength calibration
 
-fit_order = 2
+fit_order = 4
+#5 of hoger valt buiten 
 fit_1 = np.polynomial.polynomial.polyfit(x_list,wavelength_list,fit_order,w=uncertainty_x)
 
 # x & y coordinaten van de fit

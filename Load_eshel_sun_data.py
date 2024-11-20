@@ -158,7 +158,7 @@ ax2.axhline(-1*fit_1[1], color='gray', linestyle='--', linewidth=1)
 for index in range(len(x_list)):
     ax2.text(x_list[index], residuals[index], wavelength_list[index], size=8)
 plt.legend()
-# plt.show()
+plt.show()
 
 
 
@@ -171,19 +171,24 @@ plt.ylim(0,)
 plt.show()
 
 # %% Nu aan jullie om lekker te normaliseren:
-print(300/len(flux_object))
-normalisation_graph = []
-x_list = []
-for x in np.arange(6450, 6750, 300/len(flux_object)):
-    print(y, x)
-    y = 0.015*x - 92.75
-    x_list.append(x)
-    normalisation_graph.append(y)
+
+fit_order_norm = 10
+fit_2 = np.polynomial.polynomial.polyfit(wavelength_object,(flux_object-dark)/(tungstenflat-darkflat),fit_order_norm)
+
+# x & y coordinaten van de fit
+flux_object_norm = []
+for x in wavelength_object:
+    y = 0
+    # Calculate y_coordinate
+    for n in range(len(fit_2)):
+        y += fit_2[n] * (x)**n       
+    # Save coordinates
+    flux_object_norm.append(y)   
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object-dark)/(tungstenflat-darkflat))
-plt.plot(wavelength_object,(flux_object-dark)/((tungstenflat-darkflat)*normalisation_graph))
-plt.plot(x_list, normalisation_graph)
+plt.plot(wavelength_object,(flux_object-dark)/((tungstenflat-darkflat)*flux_object_norm))
+plt.plot(wavelength_object, flux_object_norm)
 plt.ylim(0,)
 plt.show()
 

@@ -49,7 +49,7 @@ plt.plot(x_pixelvalues,flux_object, label = 'Object')
 plt.plot(x_pixelvalues,SNR, label = 'SNR')
 plt.plot(x_pixelvalues,darkflat, label = 'darkflat')
 plt.legend()
-plt.show()
+# plt.show()
 
 # %% Golflengte Kalibratie met polynoomfit
 
@@ -105,7 +105,7 @@ plt.scatter(x_list,thar[x_list], c='red', label = 'calibration points' )
 for index in range(len(x_list)):
     plt.text(x_list[index]+20, thar[x_list][index]+20, wavelength_list[index], size=8)
 plt.legend()
-plt.show()
+# plt.show()
 
 # %% Polynomial fit for wavelength calibration
 
@@ -158,7 +158,7 @@ ax2.axhline(-1*fit_1[1], color='gray', linestyle='--', linewidth=1)
 for index in range(len(x_list)):
     ax2.text(x_list[index], residuals[index], wavelength_list[index], size=8)
 plt.legend()
-plt.show()
+# plt.show()
 
 
 
@@ -171,6 +171,22 @@ plt.ylim(0,)
 plt.show()
 
 # %% Nu aan jullie om lekker te normaliseren:
+print(300/len(flux_object))
+normalisation_graph = []
+x_list = []
+for x in np.arange(6450, 6750, 300/len(flux_object)):
+    print(y, x)
+    y = 0.015*x - 92.75
+    x_list.append(x)
+    normalisation_graph.append(y)
+
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object,(flux_object-dark)/(tungstenflat-darkflat))
+plt.plot(wavelength_object,(flux_object-dark)/((tungstenflat-darkflat)*normalisation_graph))
+plt.plot(x_list, normalisation_graph)
+plt.ylim(0,)
+plt.show()
+
 
 
 

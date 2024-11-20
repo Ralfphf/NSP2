@@ -25,7 +25,7 @@ from tqdm import tqdm
     
     # For example if you would like the flux of the object in order 3:
 
-main_folder = r'C:\Users\Ralfy\OneDrive - UvA\Natuur- & Sterrenkunde Bachelor\2e Jaar\NSP2 & ECPC\NSP2\Flux_raw_sunLimbA\Flux_raw_sunLimbA'
+main_folder = r'C:\Users\Ralfy\OneDrive - UvA\Natuur- & Sterrenkunde Bachelor\2e Jaar\NSP2 & ECPC\NSP2\Flux_raw_sunLimbB\Flux_raw_sunLimbB'
 
 N_order = 3
 data_order_N = np.loadtxt(os.path.join(main_folder, "data_raw_order_{}.csv").format(N_order),  delimiter=',')
@@ -49,7 +49,7 @@ plt.plot(x_pixelvalues,flux_object, label = 'Object')
 plt.plot(x_pixelvalues,SNR, label = 'SNR')
 plt.plot(x_pixelvalues,darkflat, label = 'darkflat')
 plt.legend()
-# plt.show()
+plt.show()
 
 # %% Golflengte Kalibratie met polynoomfit
 
@@ -105,7 +105,7 @@ plt.scatter(x_list,thar[x_list], c='red', label = 'calibration points' )
 for index in range(len(x_list)):
     plt.text(x_list[index]+20, thar[x_list][index]+20, wavelength_list[index], size=8)
 plt.legend()
-# plt.show()
+plt.show()
 
 # %% Polynomial fit for wavelength calibration
 
@@ -176,21 +176,25 @@ fit_order_norm = 10
 fit_2 = np.polynomial.polynomial.polyfit(wavelength_object,(flux_object-dark)/(tungstenflat-darkflat),fit_order_norm)
 
 # x & y coordinaten van de fit
-flux_object_norm = []
+normalisation_fit= []
 for x in wavelength_object:
     y = 0
     # Calculate y_coordinate
     for n in range(len(fit_2)):
-        y += fit_2[n] * (x)**n       
+        y += (fit_2[n] * (x)**n) + 0.1
     # Save coordinates
-    flux_object_norm.append(y)   
+    normalisation_fit.append(y)   
 
+flux_object_norm = (flux_object-dark)/((tungstenflat-darkflat)*normalisation_fit)
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-plt.plot(wavelength_object,(flux_object-dark)/(tungstenflat-darkflat))
-plt.plot(wavelength_object,(flux_object-dark)/((tungstenflat-darkflat)*flux_object_norm))
-plt.plot(wavelength_object, flux_object_norm)
+# plt.plot(wavelength_object,(flux_object-dark)/(tungstenflat-darkflat))
+plt.plot(wavelength_object, flux_object_norm, '.')
+# plt.plot(wavelength_object, flux_object_norm)
 plt.ylim(0,)
 plt.show()
+
+print(np.where(flux_object_norm == min(flux_object_norm))[0][0], min(flux_object_norm))
+print(f"De golflengte van H-alpha is {wavelength_object[np.where(flux_object_norm == min(flux_object_norm))[0][0]]}")
 
 
 

@@ -279,10 +279,27 @@ plt.legend()
 plt.show()
 
 
+min_H_alpha_A=H_alpha_A_wavelength[np.where(H_alpha_A == min(H_alpha_A))[0][0]]
+min_H_alpha_B=H_alpha_B_wavelength[np.where(H_alpha_B == min(H_alpha_B))[0][0]]
 print(np.where(H_alpha_A == min(H_alpha_A))[0][0], min(H_alpha_A))
-print(f"De golflengte van H-alpha dataset A is {H_alpha_A_wavelength[np.where(H_alpha_A == min(H_alpha_A))[0][0]]}")
+print(f"De golflengte van H-alpha dataset A is {min_H_alpha_A}")
 print(np.where(H_alpha_B == min(H_alpha_B))[0][0], min(H_alpha_B))
-print(f"De golflengte van H-alpha dataset B is {H_alpha_B_wavelength[np.where(H_alpha_B == min(H_alpha_B))[0][0]]}")
+print(f"De golflengte van H-alpha dataset B is {min_H_alpha_B}")
+
+R=696340000
+c=299792458
+
+lambda0 = (min_H_alpha_B + min_H_alpha_A)/2
+delta_lambda = abs(min_H_alpha_B - lambda0)
+
+v = c* (delta_lambda/lambda0)
+
+print(lambda0, delta_lambda, v)
+
+
+T = ((2*np.pi*R)/v)
+print(f"{T} is de omlooptijd in seconden")
+print(f"{T/(60*60*24)} is de omlooptijd in dagen")
 
 
 

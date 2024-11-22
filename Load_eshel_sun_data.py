@@ -54,7 +54,7 @@ flux_object_B = data_order_N_B[4]
 SNR_B = data_order_N_B[5]
 darkflat_B = data_order_N_B[6]
 
-
+'''
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_A,thar_A, label = 'ThAr')
 plt.plot(x_pixelvalues_A,tungstenflat_A, label = 'Tungsten')
@@ -70,14 +70,14 @@ plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_B,thar_B, label = 'ThAr')
 plt.plot(x_pixelvalues_B,tungstenflat_B, label = 'Tungsten')
 plt.plot(x_pixelvalues_B,bias_B, label = 'Bias')
-plt.plot(x_pixelvalues_B,dark_B, label = 'Dark_A')
+plt.plot(x_pixelvalues_B,dark_B, label = 'Dark')
 plt.plot(x_pixelvalues_B,flux_object_B, label = 'Object')
 plt.plot(x_pixelvalues_B,SNR_B, label = 'SNR')
 plt.plot(x_pixelvalues_B,darkflat_B, label = 'darkflat')
 plt.legend()
 plt.show()
 
-
+'''
 
 # %% Golflengte Kalibratie met polynoomfit
 
@@ -127,19 +127,20 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5]
 
-
+'''
 plt.plot(x_pixelvalues_A,thar_A)
 plt.scatter(x_list,thar_A[x_list], c='red', label = 'calibration points' )
 for index in range(len(x_list)):
     plt.text(x_list[index]+20, thar_A[x_list][index]+20, wavelength_list[index], size=8)
 plt.legend()
 plt.show()
-
+'''
 # %% Polynomial fit for wavelength calibration
 
 fit_order = 4
 #5 of hoger valt buiten 
 fit_1 = np.polynomial.polynomial.polyfit(x_list,wavelength_list,fit_order,w=uncertainty_x)
+print(fit_1)
 
 # x & y coordinaten van de fit
 wavelength_object = []
@@ -164,7 +165,7 @@ for i, x_value in enumerate(x_list):
     residuals.append(residual)
     
 # lekker plotten:
-
+'''
 fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, gridspec_kw={'height_ratios': [7, 2]})
 fig.subplots_adjust(hspace=0)
 
@@ -187,12 +188,12 @@ for index in range(len(x_list)):
     ax2.text(x_list[index], residuals[index], wavelength_list[index], size=8)
 plt.legend()
 plt.show()
-
+'''
 
 
 
 # %% first order flux correction:
-
+'''
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
 plt.ylim(0,)
@@ -202,6 +203,7 @@ plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B))
 plt.ylim(0,)
 plt.show()
+'''
 # %% Nu aan jullie om lekker te normaliseren:
 
 fit_order_norm = 10
@@ -238,14 +240,14 @@ H_alpha_B_wavelength = []
 H_alpha_B_intensity = []
 
 for i in range(len(wavelength_object)):
-    if 6562 < wavelength_object[i] < 6563.5:
+    if 6562.1 < wavelength_object[i] < 6563.6:
         H_alpha_A_wavelength.append(wavelength_object[i])
         H_alpha_A_intensity.append(flux_object_norm_A[i])
         H_alpha_B_wavelength.append(wavelength_object[i])
         H_alpha_B_intensity.append(flux_object_norm_B[i])
 
 
-fit_H_alpha_A =  np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 2)
+fit_H_alpha_A=  np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 5)
 H_alpha_A = []
 for x in H_alpha_A_wavelength:
     y = 0
@@ -255,7 +257,9 @@ for x in H_alpha_A_wavelength:
     # Save coordinates
     H_alpha_A.append(y) 
 
-fit_H_alpha_B =  np.polynomial.polynomial.polyfit(H_alpha_B_wavelength,H_alpha_B_intensity, 2)
+fit_H_alpha_B =  np.polynomial.polynomial.polyfit(H_alpha_B_wavelength,H_alpha_B_intensity, 5)
+
+
 H_alpha_B = []
 for x in H_alpha_B_wavelength:
     y = 0
@@ -268,13 +272,13 @@ for x in H_alpha_B_wavelength:
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 # plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
-plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(H_alpha_A_wavelength, H_alpha_A, label='fitfunctie A')
-plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunctie B')
+# plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
+plt.plot(H_alpha_A_wavelength, H_alpha_A, label='fitfunctie A', linewidth=1)
+# plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunctie B', linewidth=1)
 # plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
 plt.xlabel('Wavelenght (Angstrom)')
-plt.ylabel("Intensiteit (W/m^2)")
+plt.ylabel("Genormaliseerde Intensiteit")
 plt.legend()
 plt.show()
 

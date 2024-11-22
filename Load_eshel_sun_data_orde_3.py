@@ -140,7 +140,6 @@ plt.show()
 fit_order = 4
 #5 of hoger valt buiten 
 fit_1 = np.polynomial.polynomial.polyfit(x_list,wavelength_list,fit_order,w=uncertainty_x)
-print(fit_1)
 
 # x & y coordinaten van de fit
 wavelength_object = []
@@ -247,7 +246,30 @@ for i in range(len(wavelength_object)):
         H_alpha_B_intensity.append(flux_object_norm_B[i])
 
 
-fit_H_alpha_A=  np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 5)
+fit_H_alpha_A = np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 5)
+print(fit_H_alpha_A)
+print(np.polyder(fit_H_alpha_A, 1))
+
+
+z = [-1.53200913e-09, 1.40776779e-05, 5.28039891e-02, -3.46544929e+02, -3.98134659e+06, 1.86652649e+10]
+x1=np.linspace(6562.1, 6563.6, 1000)
+
+for x in x1:
+    if np.polyval(np.polyder(z, 1), x) < 0.0001:
+        print(x)
+plt.plot(x1, np.polyval(z, x1))
+plt.show()
+plt.plot(x1, np.polyval(np.polyder(z, 1), x1))
+plt.show()
+
+'''
+min_value = np.polyval(np.polyder(z, 1), 6562.1)
+for x in x1:
+    if np.polyval(np.polyder(z, 1), x) < min_value:
+        min_value = np.polyval(np.polyder(z, 1), x)
+        print(x)
+'''
+
 H_alpha_A = []
 for x in H_alpha_A_wavelength:
     y = 0

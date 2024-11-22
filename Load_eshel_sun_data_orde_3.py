@@ -165,7 +165,7 @@ for i, x_value in enumerate(x_list):
     residuals.append(residual)
     
 # lekker plotten:
-'''
+
 fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, gridspec_kw={'height_ratios': [7, 2]})
 fig.subplots_adjust(hspace=0)
 
@@ -188,7 +188,7 @@ for index in range(len(x_list)):
     ax2.text(x_list[index], residuals[index], wavelength_list[index], size=8)
 plt.legend()
 plt.show()
-'''
+
 
 
 

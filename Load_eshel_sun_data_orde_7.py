@@ -53,7 +53,7 @@ flux_object_B = data_order_N_B[4]
 SNR_B = data_order_N_B[5]
 darkflat_B = data_order_N_B[6]
 
-
+# different absorption spectra with A
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_A,thar_A, label = 'ThAr')
 plt.plot(x_pixelvalues_A,tungstenflat_A, label = 'Tungsten')
@@ -65,6 +65,8 @@ plt.plot(x_pixelvalues_A,darkflat_A, label = 'darkflat')
 plt.legend()
 plt.show()
 
+
+# different absorption spectra with B
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_B,thar_B, label = 'ThAr')
 plt.plot(x_pixelvalues_B,tungstenflat_B, label = 'Tungsten')
@@ -111,6 +113,7 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5]
 
+#calibration points
 plt.plot(x_pixelvalues_A,thar_A)
 plt.scatter(x_list,thar_A[x_list], c='red', label = 'calibration points' )
 for index in range(len(x_list)):
@@ -146,7 +149,7 @@ for i, x_value in enumerate(x_list):
     residuals.append(residual)
     
 # lekker plotten:
-
+#calibration fit
 fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, gridspec_kw={'height_ratios': [7, 2]})
 fig.subplots_adjust(hspace=0)
 
@@ -171,7 +174,7 @@ plt.show()
 
 
 
-# %% first order flux correction:
+# %% first order flux correction- not normalized:
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
@@ -184,6 +187,7 @@ plt.ylim(0,)
 plt.show()
 
 # %% Nu aan jullie om lekker te normaliseren:
+#first order flux correction- normalized:
 
 fit_order_norm = 10
 fit_2_A = np.polynomial.polynomial.polyfit(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A),fit_order_norm)
@@ -218,9 +222,9 @@ Na_D1_A_intensity = []
 Na_D1_B_wavelength = []
 Na_D1_B_intensity = []
 
-
+# calculate rotztion period with Na-D1
 for i in range(len(wavelength_object)):
-    if 5890.0 < wavelength_object[i] < 5891.0:
+    if 5889.9 < wavelength_object[i] < 5891.0:
         Na_D1_A_wavelength.append(wavelength_object[i])
         Na_D1_A_intensity.append(flux_object_norm_A[i])
         Na_D1_B_wavelength.append(wavelength_object[i])
@@ -247,13 +251,19 @@ for x in Na_D1_B_wavelength:
     # Save coordinates
     Na_D1_B.append(y) 
 
+#Na-D1
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-# plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
-plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
-# plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(Na_D1_A_wavelength, Na_D1_A, label='fitfunctie A', linewidth=1)
-# plt.plot(Na_D1_B_wavelength, Na_D1_B, label='fitfunctie B', linewidth=1)
-# plt.plot(wavelength_object, flux_object_norm_B)
+plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Na-D1 A')
+plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Na-D1 B')
+plt.legend()
+plt.show()
+
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'lightblue')
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'blue')
+plt.plot(Na_D1_A_wavelength, Na_D1_A, label='fitfunctie A', linewidth=1, color = 'yellow')
+plt.plot(Na_D1_B_wavelength, Na_D1_B, label='fitfunctie B', linewidth=1, color = 'orange')
+plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
 plt.xlabel('Wavelength (Angstrom)')
 plt.ylabel("Genormaliseerde Intensiteit")
@@ -264,28 +274,105 @@ plt.show()
 min_Na_D1_A=Na_D1_A_wavelength[np.where(Na_D1_A == min(Na_D1_A))[0][0]]
 min_Na_D1_B=Na_D1_B_wavelength[np.where(Na_D1_B == min(Na_D1_B))[0][0]]
 print(np.where(Na_D1_A == min(Na_D1_A))[0][0], min(Na_D1_A))
-print(f"De golflengte van H-alpha dataset A is {min_Na_D1_A}")
+print(f"De golflengte van Na-D1 dataset A is {min_Na_D1_A}")
 print(np.where(Na_D1_B == min(Na_D1_B))[0][0], min(Na_D1_B))
-print(f"De golflengte van H-alpha dataset B is {min_Na_D1_B}")
+print(f"De golflengte van Na-D1 dataset B is {min_Na_D1_B}")
 
 R=696340000
 c=299792458
 
-lambda0 = (min_Na_D1_B + min_Na_D1_A)/2
-delta_lambda = abs(min_Na_D1_B - lambda0)
+lambda_gem_1 = (min_Na_D1_B + min_Na_D1_A)/2
+delta_lambda_1 = abs(min_Na_D1_B - lambda_gem_1)
 
-v = c* (delta_lambda/lambda0)
+v_1 = c* (delta_lambda_1/lambda_gem_1)
 
-print(lambda0, delta_lambda, v)
-
-
-T = ((2*np.pi*R)/v)
-print(f"{T} is de omlooptijd in seconden")
-print(f"{T/(60*60*24)} is de omlooptijd in dagen")
+print(lambda_gem_1, delta_lambda_1, v_1)
 
 
+T_1 = ((2*np.pi*R)/v_1)
+print(f"{T_1} is de omlooptijd in seconden berekend met de Na-D1 lijn")
+print(f"{T_1/(60*60*24)} is de omlooptijd in dagen berekend met de Na-D1 lijn")
 
 # %%
+Na_D2_A_wavelength = []
+Na_D2_A_intensity = []
+Na_D2_B_wavelength = []
+Na_D2_B_intensity = []
+
+# calculate rotztion period with Na-D2
+for i in range(len(wavelength_object)):
+    if 5895.9 < wavelength_object[i] < 5896.6:
+        Na_D2_A_wavelength.append(wavelength_object[i])
+        Na_D2_A_intensity.append(flux_object_norm_A[i])
+        Na_D2_B_wavelength.append(wavelength_object[i])
+        Na_D2_B_intensity.append(flux_object_norm_B[i])
+
+
+fit_Na_D2_A= np.polynomial.polynomial.polyfit(Na_D2_A_wavelength,Na_D2_A_intensity, 5)
+Na_D2_A = []
+for x in Na_D2_A_wavelength:
+    y = 0
+    # Calculate y_coordinate
+    for n in range(len(fit_Na_D2_A)):
+        y += (fit_Na_D2_A[n] * (x)**n)
+    # Save coordinates
+    Na_D2_A.append(y) 
+
+fit_Na_D2_B =  np.polynomial.polynomial.polyfit(Na_D2_B_wavelength,Na_D2_B_intensity, 5)
+Na_D2_B = []
+for x in Na_D2_B_wavelength:
+    y = 0
+    # Calculate y_coordinate
+    for n in range(len(fit_Na_D2_B)):
+        y += (fit_Na_D2_B[n] * (x)**n)
+    # Save coordinates
+    Na_D2_B.append(y) 
+
+#Na-D2
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Na-D2 A')
+plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Na-D2 B')
+plt.legend()
+plt.show()
+
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'green')
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'lime')
+plt.plot(Na_D2_A_wavelength, Na_D2_A, label='fitfunctie A', linewidth=1, color = 'crimson')
+plt.plot(Na_D2_B_wavelength, Na_D2_B, label='fitfunctie B', linewidth=1, color = 'fuchsia')
+plt.plot(wavelength_object, flux_object_norm_B)
+plt.ylim(0,)
+plt.xlabel('Wavelength (Angstrom)')
+plt.ylabel("Genormaliseerde Intensiteit")
+plt.legend()
+plt.show()
+
+
+min_Na_D2_A=Na_D2_A_wavelength[np.where(Na_D2_A == min(Na_D2_A))[0][0]]
+min_Na_D2_B=Na_D2_B_wavelength[np.where(Na_D2_B == min(Na_D2_B))[0][0]]
+print(np.where(Na_D2_A == min(Na_D2_A))[0][0], min(Na_D2_A))
+print(f"De golflengte van Na-D2 dataset A is {min_Na_D2_A}")
+print(np.where(Na_D2_B == min(Na_D2_B))[0][0], min(Na_D2_B))
+print(f"De golflengte van Na-D2 dataset B is {min_Na_D2_B}")
+
+R=696340000
+c=299792458
+
+lambda_gem_2 = (min_Na_D2_B + min_Na_D2_A)/2
+delta_lambda_2 = abs(min_Na_D2_B - lambda_gem_2)
+
+v_2 = c* (delta_lambda_2/lambda_gem_2)
+
+print(lambda_gem_2, delta_lambda_2, v_2)
+
+
+T_2 = ((2*np.pi*R)/v_2)
+print(f"{T_2} is de omlooptijd in seconden berekend met de Na-D2 lijn")
+print(f"{T_2/(60*60*24)} is de omlooptijd in dagen berekend met de Na-D2 lijn")
+
+
+
+
 
 
 

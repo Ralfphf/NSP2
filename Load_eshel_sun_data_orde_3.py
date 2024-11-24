@@ -302,6 +302,8 @@ plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), l
 plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption B')
 plt.legend()
 plt.show()
+
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A normalized")
 plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B normalized")
 plt.plot(H_alpha_A_wavelength, H_alpha_A, label='fitfunction A', linewidth=1)

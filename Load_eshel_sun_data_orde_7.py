@@ -8,7 +8,6 @@ import numpy as np
 import os
 import glob
 from astropy.io import fits
-import numpy as np
 from scipy.signal import find_peaks_cwt
 from astropy.stats import sigma_clipped_stats
 import matplotlib.pyplot as plt
@@ -26,8 +25,8 @@ from tqdm import tqdm
     # For example if you would like the flux of the object in order 3:
 
 
-main_folder_A = r'C:\Users\Ralfy\OneDrive - UvA\Natuur- & Sterrenkunde Bachelor\2e Jaar\NSP2 & ECPC\NSP2\Flux_raw_sunLimbA\Flux_raw_sunLimbA'
-main_folder_B = r'C:\Users\Ralfy\OneDrive - UvA\Natuur- & Sterrenkunde Bachelor\2e Jaar\NSP2 & ECPC\NSP2\Flux_raw_sunLimbB\Flux_raw_sunLimbB'
+main_folder_A = r'C:\Users\post\OneDrive\Documenten\UvA-VU\Jaar 2\Practicum zonnefysica\NSP2\Flux_raw_sunLimbA\Flux_raw_sunLimbA'
+main_folder_B = r'C:\Users\post\OneDrive\Documenten\UvA-VU\Jaar 2\Practicum zonnefysica\NSP2\Flux_raw_sunLimbB\Flux_raw_sunLimbB'
 
 N_order = 7
 data_order_N_A = np.loadtxt(os.path.join(main_folder_A, "data_raw_order_{}.csv").format(N_order),  delimiter=',')
@@ -54,7 +53,7 @@ flux_object_B = data_order_N_B[4]
 SNR_B = data_order_N_B[5]
 darkflat_B = data_order_N_B[6]
 
-'''
+
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_A,thar_A, label = 'ThAr')
 plt.plot(x_pixelvalues_A,tungstenflat_A, label = 'Tungsten')
@@ -76,7 +75,7 @@ plt.plot(x_pixelvalues_B,SNR_B, label = 'SNR')
 plt.plot(x_pixelvalues_B,darkflat_B, label = 'darkflat')
 plt.legend()
 plt.show()
-'''
+
 
 # %% Golflengte Kalibratie met polynoomfit
 
@@ -110,8 +109,7 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5,
                      0.5,
-                     0.5
-                     ]
+                     0.5]
 
 plt.plot(x_pixelvalues_A,thar_A)
 plt.scatter(x_list,thar_A[x_list], c='red', label = 'calibration points' )
@@ -122,8 +120,7 @@ plt.show()
 
 # %% Polynomial fit for wavelength calibration
 
-fit_order = 4
-#5 of hoger valt buiten 
+fit_order = 2 #3 or higher goes wrong
 fit_1 = np.polynomial.polynomial.polyfit(x_list,wavelength_list,fit_order,w=uncertainty_x)
 print(fit_1)
 
@@ -136,7 +133,6 @@ for x in x_pixelvalues_A:
         y += fit_1[n] * (x)**n       
     # Save coordinates
     wavelength_object.append(y)   
-
 
 #  Residuals berekenen
 
@@ -160,11 +156,10 @@ ax1.set_ylabel("Wavelength [Angstrom]")
 ax1.errorbar(x_list, wavelength_list, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 ax1.scatter(x_list,wavelength_list, c='blue')
 
-
-
-ax2.errorbar(x_list, residuals, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
+# mijn errorbars werken nog niet goed
 ax2.scatter(x_list,residuals)
-ax2.set_ylabel("Pixels")
+ax2.errorbar(x_list, residuals, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
+ax2.set_xlabel("Pixels")
 ax2.set_ylabel("Residuals [Angstrom]")
 ax2.axhline(0, color='black', linestyle='--', linewidth=1, label = 'model')
 ax2.axhline(fit_1[1], color='gray', linestyle='--', linewidth=1, label = '1 pixel difference')
@@ -218,68 +213,66 @@ for x in wavelength_object:
 flux_object_norm_A = (flux_object_A-dark_A)/((tungstenflat_A-darkflat_A)*normalisation_fit_A)
 flux_object_norm_B = (flux_object_B-dark_B)/((tungstenflat_B-darkflat_B)*normalisation_fit_B)
 
-H_alpha_A_wavelength = []
-H_alpha_A_intensity = []
-H_alpha_B_wavelength = []
-H_alpha_B_intensity = []
+Na_D1_A_wavelength = []
+Na_D1_A_intensity = []
+Na_D1_B_wavelength = []
+Na_D1_B_intensity = []
 
 
 for i in range(len(wavelength_object)):
-    if 6562.1 < wavelength_object[i] < 6563.6:
-        H_alpha_A_wavelength.append(wavelength_object[i])
-        H_alpha_A_intensity.append(flux_object_norm_A[i])
-        H_alpha_B_wavelength.append(wavelength_object[i])
-        H_alpha_B_intensity.append(flux_object_norm_B[i])
+    if 5890.0 < wavelength_object[i] < 5891.0:
+        Na_D1_A_wavelength.append(wavelength_object[i])
+        Na_D1_A_intensity.append(flux_object_norm_A[i])
+        Na_D1_B_wavelength.append(wavelength_object[i])
+        Na_D1_B_intensity.append(flux_object_norm_B[i])
 
 
-fit_H_alpha_A= np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 5)
-H_alpha_A = []
-for x in H_alpha_A_wavelength:
+fit_Na_D1_A= np.polynomial.polynomial.polyfit(Na_D1_A_wavelength,Na_D1_A_intensity, 5)
+Na_D1_A = []
+for x in Na_D1_A_wavelength:
     y = 0
     # Calculate y_coordinate
-    for n in range(len(fit_H_alpha_A)):
-        y += (fit_H_alpha_A[n] * (x)**n)
+    for n in range(len(fit_Na_D1_A)):
+        y += (fit_Na_D1_A[n] * (x)**n)
     # Save coordinates
-    H_alpha_A.append(y) 
+    Na_D1_A.append(y) 
 
-fit_H_alpha_B =  np.polynomial.polynomial.polyfit(H_alpha_B_wavelength,H_alpha_B_intensity, 5)
-
-
-H_alpha_B = []
-for x in H_alpha_B_wavelength:
+fit_Na_D1_B =  np.polynomial.polynomial.polyfit(Na_D1_B_wavelength,Na_D1_B_intensity, 5)
+Na_D1_B = []
+for x in Na_D1_B_wavelength:
     y = 0
     # Calculate y_coordinate
-    for n in range(len(fit_H_alpha_B)):
-        y += (fit_H_alpha_B[n] * (x)**n)
+    for n in range(len(fit_Na_D1_B)):
+        y += (fit_Na_D1_B[n] * (x)**n)
     # Save coordinates
-    H_alpha_B.append(y) 
+    Na_D1_B.append(y) 
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 # plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
 # plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(H_alpha_A_wavelength, H_alpha_A, label='fitfunctie A', linewidth=1)
-# plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunctie B', linewidth=1)
+plt.plot(Na_D1_A_wavelength, Na_D1_A, label='fitfunctie A', linewidth=1)
+# plt.plot(Na_D1_B_wavelength, Na_D1_B, label='fitfunctie B', linewidth=1)
 # plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
-plt.xlabel('Wavelenght (Angstrom)')
+plt.xlabel('Wavelength (Angstrom)')
 plt.ylabel("Genormaliseerde Intensiteit")
 plt.legend()
 plt.show()
 
 
-min_H_alpha_A=H_alpha_A_wavelength[np.where(H_alpha_A == min(H_alpha_A))[0][0]]
-min_H_alpha_B=H_alpha_B_wavelength[np.where(H_alpha_B == min(H_alpha_B))[0][0]]
-print(np.where(H_alpha_A == min(H_alpha_A))[0][0], min(H_alpha_A))
-print(f"De golflengte van H-alpha dataset A is {min_H_alpha_A}")
-print(np.where(H_alpha_B == min(H_alpha_B))[0][0], min(H_alpha_B))
-print(f"De golflengte van H-alpha dataset B is {min_H_alpha_B}")
+min_Na_D1_A=Na_D1_A_wavelength[np.where(Na_D1_A == min(Na_D1_A))[0][0]]
+min_Na_D1_B=Na_D1_B_wavelength[np.where(Na_D1_B == min(Na_D1_B))[0][0]]
+print(np.where(Na_D1_A == min(Na_D1_A))[0][0], min(Na_D1_A))
+print(f"De golflengte van H-alpha dataset A is {min_Na_D1_A}")
+print(np.where(Na_D1_B == min(Na_D1_B))[0][0], min(Na_D1_B))
+print(f"De golflengte van H-alpha dataset B is {min_Na_D1_B}")
 
 R=696340000
 c=299792458
 
-lambda0 = (min_H_alpha_B + min_H_alpha_A)/2
-delta_lambda = abs(min_H_alpha_B - lambda0)
+lambda0 = (min_Na_D1_B + min_Na_D1_A)/2
+delta_lambda = abs(min_Na_D1_B - lambda0)
 
 v = c* (delta_lambda/lambda0)
 

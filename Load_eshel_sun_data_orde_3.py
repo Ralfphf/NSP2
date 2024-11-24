@@ -54,7 +54,7 @@ flux_object_B = data_order_N_B[4]
 SNR_B = data_order_N_B[5]
 darkflat_B = data_order_N_B[6]
 
-'''
+#different absorption spectra with A
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_A,thar_A, label = 'ThAr')
 plt.plot(x_pixelvalues_A,tungstenflat_A, label = 'Tungsten')
@@ -66,6 +66,7 @@ plt.plot(x_pixelvalues_A,darkflat_A, label = 'darkflat')
 plt.legend()
 plt.show()
 
+#different absorption spectra with B
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_B,thar_B, label = 'ThAr')
 plt.plot(x_pixelvalues_B,tungstenflat_B, label = 'Tungsten')
@@ -77,7 +78,7 @@ plt.plot(x_pixelvalues_B,darkflat_B, label = 'darkflat')
 plt.legend()
 plt.show()
 
-'''
+
 
 # %% Golflengte Kalibratie met polynoomfit
 
@@ -127,14 +128,14 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5]
 
-'''
+#calibration points
 plt.plot(x_pixelvalues_A,thar_A)
 plt.scatter(x_list,thar_A[x_list], c='red', label = 'calibration points' )
 for index in range(len(x_list)):
     plt.text(x_list[index]+20, thar_A[x_list][index]+20, wavelength_list[index], size=8)
 plt.legend()
 plt.show()
-'''
+
 # %% Polynomial fit for wavelength calibration
 
 fit_order = 4
@@ -164,7 +165,7 @@ for i, x_value in enumerate(x_list):
     residuals.append(residual)
     
 # lekker plotten:
-
+#calibration fit
 fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, gridspec_kw={'height_ratios': [7, 2]})
 fig.subplots_adjust(hspace=0)
 
@@ -174,11 +175,9 @@ ax1.set_ylabel("Wavelength [Angstrom]")
 ax1.errorbar(x_list, wavelength_list, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 ax1.scatter(x_list,wavelength_list, c='blue')
 
-
-
 ax2.errorbar(x_list, residuals, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 ax2.scatter(x_list,residuals)
-ax2.set_ylabel("Pixels")
+ax2.set_xlabel("Pixels")
 ax2.set_ylabel("Residuals [Angstrom]")
 ax2.axhline(0, color='black', linestyle='--', linewidth=1, label = 'model')
 ax2.axhline(fit_1[1], color='gray', linestyle='--', linewidth=1, label = '1 pixel difference')
@@ -188,27 +187,27 @@ for index in range(len(x_list)):
 plt.legend()
 plt.show()
 
-
-
-
-# %% first order flux correction:
-'''
+#%%first order flux correction - not normalized:
+#A
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
+plt.xlabel('Wavelengths A')
+plt.ylabel('Intensity')
 plt.ylim(0,)
 plt.show()
-
+#B
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B))
+plt.xlabel('Wavelengths B')
+plt.ylabel('Intensity')
 plt.ylim(0,)
 plt.show()
-'''
-# %% Nu aan jullie om lekker te normaliseren:
 
+#%% first order flux correction - normalized:
 fit_order_norm = 10
 fit_2_A = np.polynomial.polynomial.polyfit(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A),fit_order_norm)
 
-# x & y coordinaten van de fit
+# x & y coordinates of the fit for A
 normalisation_fit_A= []
 for x in wavelength_object:
     y = 0
@@ -220,7 +219,7 @@ for x in wavelength_object:
 
 fit_2_B = np.polynomial.polynomial.polyfit(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B),fit_order_norm)
 
-# x & y coordinaten van de fit
+# x & y coordinates of the fit for B
 normalisation_fit_B= []
 for x in wavelength_object:
     y = 0
@@ -238,8 +237,10 @@ H_alpha_A_intensity = []
 H_alpha_B_wavelength = []
 H_alpha_B_intensity = []
 
+# determine H-aplpha absorption line: This has toe be different for other absoption lines, 
+# maybe minima are still possible
 for i in range(len(wavelength_object)):
-    if 6562.1 < wavelength_object[i] < 6563.6:
+    if 6562.55 < wavelength_object[i] < 6564.15:
         H_alpha_A_wavelength.append(wavelength_object[i])
         H_alpha_A_intensity.append(flux_object_norm_A[i])
         H_alpha_B_wavelength.append(wavelength_object[i])
@@ -247,28 +248,33 @@ for i in range(len(wavelength_object)):
 
 
 fit_H_alpha_A = np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 5)
-print(fit_H_alpha_A)
-print(np.polyder(fit_H_alpha_A, 1))
-
+# print(fit_H_alpha_A)
+# print(np.polyder(fit_H_alpha_A, 1))
 
 z = [-1.53200913e-09, 1.40776779e-05, 5.28039891e-02, -3.46544929e+02, -3.98134659e+06, 1.86652649e+10]
 x1=np.linspace(6562.1, 6563.6, 1000)
 
+#what is the reason for these plots???
+'''
 for x in x1:
     if np.polyval(np.polyder(z, 1), x) < 0.0001:
         print(x)
 plt.plot(x1, np.polyval(z, x1))
+plt.xlabel('x1')
+plt.ylabel(' some y??')
 plt.show()
 plt.plot(x1, np.polyval(np.polyder(z, 1), x1))
+plt.xlabel(' another x1')
+plt.ylabel(' another y??')
 plt.show()
-
 '''
+
 min_value = np.polyval(np.polyder(z, 1), 6562.1)
 for x in x1:
     if np.polyval(np.polyder(z, 1), x) < min_value:
         min_value = np.polyval(np.polyder(z, 1), x)
-        print(x)
-'''
+        print(f' This is x:{x}')
+
 
 H_alpha_A = []
 for x in H_alpha_A_wavelength:
@@ -292,40 +298,44 @@ for x in H_alpha_B_wavelength:
     H_alpha_B.append(y) 
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-# plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
-plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
-# plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(H_alpha_A_wavelength, H_alpha_A, label='fitfunctie A', linewidth=1)
-# plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunctie B', linewidth=1)
+plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label='absorbtion A')  
+plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption B')
+plt.legend()
+plt.show()
+plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A normalized")
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B normalized")
+plt.plot(H_alpha_A_wavelength, H_alpha_A, label='fitfunction A', linewidth=1)
+plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunction B', linewidth=1)
 # plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
-plt.xlabel('Wavelenght (Angstrom)')
-plt.ylabel("Genormaliseerde Intensiteit")
+plt.xlabel('Wavelength (Angstrom)')
+plt.ylabel("Normalized Intensity")
 plt.legend()
 plt.show()
 
-
+#the fitted wavelength of A and B
 min_H_alpha_A=H_alpha_A_wavelength[np.where(H_alpha_A == min(H_alpha_A))[0][0]]
 min_H_alpha_B=H_alpha_B_wavelength[np.where(H_alpha_B == min(H_alpha_B))[0][0]]
+
 print(np.where(H_alpha_A == min(H_alpha_A))[0][0], min(H_alpha_A))
-print(f"De golflengte van H-alpha dataset A is {min_H_alpha_A}")
+print(f"The wavelength of H-alpha in dataset A is {min_H_alpha_A}")
 print(np.where(H_alpha_B == min(H_alpha_B))[0][0], min(H_alpha_B))
-print(f"De golflengte van H-alpha dataset B is {min_H_alpha_B}")
+print(f"The wavelength of H-alpha in dataset B is {min_H_alpha_B}")
 
 R=696340000
 c=299792458
 
-lambda0 = (min_H_alpha_B + min_H_alpha_A)/2
-delta_lambda = abs(min_H_alpha_B - lambda0)
+lambda_gem = (min_H_alpha_B + min_H_alpha_A)/2
+delta_lambda = abs(min_H_alpha_B - lambda_gem)
 
-v = c* (delta_lambda/lambda0)
+v = c* (delta_lambda/lambda_gem)
 
-print(lambda0, delta_lambda, v)
+print(lambda_gem, delta_lambda, v)
 
 
 T = ((2*np.pi*R)/v)
-print(f"{T} is de omlooptijd in seconden")
-print(f"{T/(60*60*24)} is de omlooptijd in dagen")
+print(f"{T} is the rotation time in seconds.")
+print(f"{T/(60*60*24)} is the rotation time in days.")
 
 
 

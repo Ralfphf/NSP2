@@ -290,8 +290,8 @@ print(lambda_gem_1, delta_lambda_1, v_1)
 
 
 T_1 = ((2*np.pi*R)/v_1)
-print(f"{T_1} is de omlooptijd in seconden berekend met de Na-D1 lijn")
-print(f"{T_1/(60*60*24)} is de omlooptijd in dagen berekend met de Na-D1 lijn")
+print(f"{T_1} is the rotation time in seconds  calculated from Na-D1 line")
+print(f"{T_1/(60*60*24)} is the rotation time in days  calculated from Na-D1 line")
 
 # %%
 Na_D2_A_wavelength = []
@@ -338,12 +338,12 @@ plt.show()
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'green')
 plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'lime')
-plt.plot(Na_D2_A_wavelength, Na_D2_A, label='fitfunctie A', linewidth=1, color = 'crimson')
-plt.plot(Na_D2_B_wavelength, Na_D2_B, label='fitfunctie B', linewidth=1, color = 'fuchsia')
+plt.plot(Na_D2_A_wavelength, Na_D2_A, label='fitfunction A', linewidth=1, color = 'crimson')
+plt.plot(Na_D2_B_wavelength, Na_D2_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
 plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
 plt.xlabel('Wavelength (Angstrom)')
-plt.ylabel("Genormaliseerde Intensiteit")
+plt.ylabel("Normalized intensity")
 plt.legend()
 plt.show()
 
@@ -351,9 +351,9 @@ plt.show()
 min_Na_D2_A=Na_D2_A_wavelength[np.where(Na_D2_A == min(Na_D2_A))[0][0]]
 min_Na_D2_B=Na_D2_B_wavelength[np.where(Na_D2_B == min(Na_D2_B))[0][0]]
 print(np.where(Na_D2_A == min(Na_D2_A))[0][0], min(Na_D2_A))
-print(f"De golflengte van Na-D2 dataset A is {min_Na_D2_A}")
+print(f"The wavelegth of Na-D2  in dataset A is {min_Na_D2_A}")
 print(np.where(Na_D2_B == min(Na_D2_B))[0][0], min(Na_D2_B))
-print(f"De golflengte van Na-D2 dataset B is {min_Na_D2_B}")
+print(f"The wavelength of Na-D2 in dataset B is {min_Na_D2_B}")
 
 R=696340000
 c=299792458
@@ -367,8 +367,8 @@ print(lambda_gem_2, delta_lambda_2, v_2)
 
 
 T_2 = ((2*np.pi*R)/v_2)
-print(f"{T_2} is de omlooptijd in seconden berekend met de Na-D2 lijn")
-print(f"{T_2/(60*60*24)} is de omlooptijd in dagen berekend met de Na-D2 lijn")
+print(f"{T_2} is the rotation time in seconds  calculated from Na-D2 line")
+print(f"{T_2/(60*60*24)}is the rotation time in days  calculated from Na-D2 line")
 
 
 

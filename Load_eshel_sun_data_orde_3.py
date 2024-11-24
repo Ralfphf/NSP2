@@ -336,8 +336,8 @@ print(lambda_gem, delta_lambda, v)
 
 
 T = ((2*np.pi*R)/v)
-print(f"{T} is the rotation time in seconds.")
-print(f"{T/(60*60*24)} is the rotation time in days.")
+print(f"{T} is the rotation time in seconds calculated from the H-alpha line.")
+print(f"{T/(60*60*24)} is the rotation time in days calculated from the H-alpha line.")
 
 
 

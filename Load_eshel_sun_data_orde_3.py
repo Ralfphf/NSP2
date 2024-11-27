@@ -55,7 +55,7 @@ flux_object_B = data_order_N_B[4]
 SNR_B = data_order_N_B[5]
 darkflat_B = data_order_N_B[6]
 
-
+'''
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_A,thar_A, label = 'ThAr')
 plt.plot(x_pixelvalues_A,tungstenflat_A, label = 'Tungsten')
@@ -77,7 +77,7 @@ plt.plot(x_pixelvalues_B,SNR_B, label = 'SNR')
 plt.plot(x_pixelvalues_B,darkflat_B, label = 'darkflat')
 plt.legend()
 plt.show()
-
+'''
 
 
 # %% Golflengte Kalibratie met polynoomfit
@@ -99,7 +99,6 @@ wavelength_list =   [6677.2817,
 
 x_list =            [1752,
                      4656,
-#hoogste punt        3747,
                      3748,                    
                      3319,
                      3594,
@@ -193,10 +192,9 @@ plt.show()
 
 
 # %% first order flux correction:
-
+'''
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.errorbar(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
-# yerr=(flux_object_A-dark_A)/((tungstenflat_A-darkflat_A)*SNR_A), markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
 plt.ylim(0,)
 plt.show()
 
@@ -204,7 +202,7 @@ plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B))
 plt.ylim(0,)
 plt.show()
-
+'''
 # %% Nu aan jullie om lekker te normaliseren:
 
 fit_order_norm = 10
@@ -244,7 +242,7 @@ H_alpha_A_error = []
 H_alpha_B_error = []
 
 for i in range(len(wavelength_object)):
-    if 6562.1 < wavelength_object[i] < 6563.6:
+    if 6561.9 < wavelength_object[i] < 6563.6:
         H_alpha_A_wavelength.append(wavelength_object[i])
         H_alpha_A_intensity.append(flux_object_norm_A[i])
         H_alpha_B_wavelength.append(wavelength_object[i])
@@ -254,14 +252,23 @@ for i in range(len(wavelength_object)):
 
 
 def normal_distribution(x, std, avg):
-    return y == (np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))
+    return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+1
 
-curve_fit(normal_distribution, H_alpha_A_wavelength, H_alpha_A_intensity, sigma=H_alpha_A_error)
-print(curve_fit)
+popt_n, pcov_n = curve_fit(normal_distribution, H_alpha_A_wavelength, H_alpha_A_intensity, p0=[2, 6562.7], sigma=H_alpha_A_error)
+std_opt , avg_opt = popt_n
+error_std_cov, error_avg_cov = pcov_n
+print(f'minimum gaussische functie {avg_opt}')
+print(f'sqrt variantie en sigma std{(pcov_n[0][0]**(1/2)), std_opt}')
+def second_orde_poly(x, a, b, lambda_0):
+    return a*(x-lambda_0)**2 + b
+
+popt_p, pcov_p = curve_fit(second_orde_poly, H_alpha_A_wavelength, H_alpha_A_intensity, p0=[1, 2, 6562.7], sigma=H_alpha_A_error)
+a_opt, b_opt, lambda_0_opt = popt_p
+print(f'minimum polynoom functie {lambda_0_opt}')
+print(f'sqrt variantie lambda 0 {(pcov_p[2][2]**(1/2))}')
+print(f"verschil tussen fitfuncties: {lambda_0_opt-avg_opt}")
 
 fit_H_alpha_A = np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 2)
-mu, std = norm.fit(H_alpha_A_intensity)
-print(mu, std)
 
 H_alpha_A = []
 for x in H_alpha_A_wavelength:
@@ -284,37 +291,14 @@ for x in H_alpha_B_wavelength:
     # Save coordinates
     H_alpha_B.append(y) 
 
-'''
-print(fit_H_alpha_A)
-print(np.polyder(fit_H_alpha_A, 1))
 
 
-z = [-1.53200913e-09, 1.40776779e-05, 5.28039891e-02, -3.46544929e+02, -3.98134659e+06, 1.86652649e+10]
-x1=np.linspace(6562.1, 6563.6, 1000)
-
-for x in x1:
-    if np.polyval(np.polyder(z, 1), x) < 0.0001:
-        print(x)
-plt.plot(x1, np.polyval(z, x1))
-plt.show()
-plt.plot(x1, np.polyval(np.polyder(z, 1), x1))
-plt.show()
-
-
-min_value = np.polyval(np.polyder(z, 1), 6562.1)
-for x in x1:
-    if np.polyval(np.polyder(z, 1), x) < min_value:
-        min_value = np.polyval(np.polyder(z, 1), x)
-        print(x)
-'''
-
-'''
-plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.subplots(figsize=(16.5, 11.7), dpi=300)
 # plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
 # plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(H_alpha_A_wavelength, H_alpha_A, label='fitfunctie A', linewidth=1)
-plt.plot(H_alpha_A_wavelength, norm.pdf(H_alpha_A_wavelength, mu, std))
+plt.plot(H_alpha_A_wavelength, (normal_distribution(H_alpha_A_wavelength, std_opt, avg_opt)), label='Gaussische fitfunctie')
+plt.plot(H_alpha_A_wavelength, (second_orde_poly(H_alpha_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
 plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
 # plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunctie B', linewidth=1)
 # plt.plot(wavelength_object, flux_object_norm_B)
@@ -323,9 +307,9 @@ plt.xlabel('Wavelenght (Angstrom)')
 plt.ylabel("Genormaliseerde Intensiteit")
 plt.legend()
 plt.show()
-'''
 
-'''
+
+
 min_H_alpha_A=H_alpha_A_wavelength[np.where(H_alpha_A == min(H_alpha_A))[0][0]]
 min_H_alpha_B=H_alpha_B_wavelength[np.where(H_alpha_B == min(H_alpha_B))[0][0]]
 print(np.where(H_alpha_A == min(H_alpha_A))[0][0], min(H_alpha_A))
@@ -347,7 +331,6 @@ print(lambda0, delta_lambda, v)
 T = ((2*np.pi*R)/v)
 print(f"{T} is de omlooptijd in seconden")
 print(f"{T/(60*60*24)} is de omlooptijd in dagen")
-'''
 
 
 # %%

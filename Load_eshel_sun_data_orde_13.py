@@ -8,6 +8,7 @@ import numpy as np
 import os
 import glob
 from astropy.io import fits
+import numpy as np
 from scipy.signal import find_peaks_cwt
 from astropy.stats import sigma_clipped_stats
 import matplotlib.pyplot as plt
@@ -28,7 +29,7 @@ from tqdm import tqdm
 main_folder_A = r'C:\Users\post\OneDrive\Documenten\UvA-VU\Jaar 2\Practicum zonnefysica\NSP2\Flux_raw_sunLimbA\Flux_raw_sunLimbA'
 main_folder_B = r'C:\Users\post\OneDrive\Documenten\UvA-VU\Jaar 2\Practicum zonnefysica\NSP2\Flux_raw_sunLimbB\Flux_raw_sunLimbB'
 
-N_order = 7
+N_order = 13
 data_order_N_A = np.loadtxt(os.path.join(main_folder_A, "data_raw_order_{}.csv").format(N_order),  delimiter=',')
 data_order_N_B = np.loadtxt(os.path.join(main_folder_B, "data_raw_order_{}.csv").format(N_order),  delimiter=',')
 
@@ -52,8 +53,8 @@ dark_B = data_order_N_B[3]
 flux_object_B = data_order_N_B[4]
 SNR_B = data_order_N_B[5]
 darkflat_B = data_order_N_B[6]
-"""
-# different absorption spectra with A
+'''
+#different absorption spectra with A
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_A,thar_A, label = 'ThAr')
 plt.plot(x_pixelvalues_A,tungstenflat_A, label = 'Tungsten')
@@ -65,8 +66,7 @@ plt.plot(x_pixelvalues_A,darkflat_A, label = 'darkflat')
 plt.legend()
 plt.show()
 
-
-# different absorption spectra with B
+#different absorption spectra with B
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(x_pixelvalues_B,thar_B, label = 'ThAr')
 plt.plot(x_pixelvalues_B,tungstenflat_B, label = 'Tungsten')
@@ -77,33 +77,28 @@ plt.plot(x_pixelvalues_B,SNR_B, label = 'SNR')
 plt.plot(x_pixelvalues_B,darkflat_B, label = 'darkflat')
 plt.legend()
 plt.show()
-"""
+'''
+
 
 # %% Golflengte Kalibratie met polynoomfit
 
-wavelength_list =   [5912.0853,
-                     5914.7139,
-                     5916.5992,
-                     5928.8130,
-                     5888.584,
-                     5882.6242,
-                     5885.7016,
-                     5860.3102,
-                     5834.2633,
-                     5938.8252,
-                     ]
+wavelength_list =   [5162.2845,
+                     5158.604,
+                     5154.243,
+                     5151.612,
+                     5145.3082,
+                     5141.7827,
+                     5187.7462]
 
-x_list =            [3271,
-                     3211,
-                     3165,
-                     2878,
-                     3808,
-                     3942,
-                     3874,
-                     4437,
-                     5001,
-                     2546,
-                     ]
+x_list =            [1704,
+                     1814,
+                     1940,
+                     2021,
+                     2197,
+                     2297,
+                     938,
+
+                      ]
 
 uncertainty_x =     [0.5,
                      0.5,
@@ -112,9 +107,7 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5,
                      0.5,
-                     0.5,
-                     0.5,
-                     0.5,]
+                    ]
 
 #calibration points
 plt.plot(x_pixelvalues_A,thar_A)
@@ -126,9 +119,9 @@ plt.show()
 
 # %% Polynomial fit for wavelength calibration
 
-fit_order = 2 #3 or higher goes wrong
+fit_order = 4
+#5 of hoger valt buiten 
 fit_1 = np.polynomial.polynomial.polyfit(x_list,wavelength_list,fit_order,w=uncertainty_x)
-print(fit_1)
 
 # x & y coordinaten van de fit
 wavelength_object = []
@@ -139,6 +132,7 @@ for x in x_pixelvalues_A:
         y += fit_1[n] * (x)**n       
     # Save coordinates
     wavelength_object.append(y)   
+
 
 #  Residuals berekenen
 
@@ -162,9 +156,8 @@ ax1.set_ylabel("Wavelength [Angstrom]")
 ax1.errorbar(x_list, wavelength_list, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 ax1.scatter(x_list,wavelength_list, c='blue')
 
-# mijn errorbars werken nog niet goed
-ax2.scatter(x_list,residuals)
 ax2.errorbar(x_list, residuals, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
+ax2.scatter(x_list,residuals)
 ax2.set_xlabel("Pixels")
 ax2.set_ylabel("Residuals [Angstrom]")
 ax2.axhline(0, color='black', linestyle='--', linewidth=1, label = 'model')
@@ -174,8 +167,6 @@ for index in range(len(x_list)):
     ax2.text(x_list[index], residuals[index], wavelength_list[index], size=8)
 plt.legend()
 plt.show()
-
-
 
 # %% first order flux correction- not normalized:
 

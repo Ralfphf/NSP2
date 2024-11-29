@@ -83,12 +83,15 @@ plt.show()
 wavelength_list =   [5912.0853,
                      5914.7139,
                      5916.5992,
-                     5928.8130,
+                     5928.8130  ,
                      5888.584,
                      5882.6242,
+                     5885.7016,
                      5860.3102,
                      5834.2633,
                      5938.8252,
+                     5908.9257,
+                     5891.451,
                      ]
 
 x_list =            [3271,
@@ -97,9 +100,12 @@ x_list =            [3271,
                      2878,
                      3808,
                      3942,
+                     3874,
                      4437,
                      5001,
                      2546,
+                     3344,
+                     3744,
                      ]
 
 uncertainty_x =     [0.5,
@@ -110,8 +116,12 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5,
                      0.5,
-                     0.5
+                     0.5,
+                     0.5,
+                     0.5,
+                     0.5,
                      ]
+'''
 
 plt.plot(x_pixelvalues_A,thar_A)
 plt.scatter(x_list,thar_A[x_list], c='red', label = 'calibration points' )
@@ -119,13 +129,13 @@ for index in range(len(x_list)):
     plt.text(x_list[index]+20, thar_A[x_list][index]+20, wavelength_list[index], size=8)
 plt.legend()
 plt.show()
+'''
 
 # %% Polynomial fit for wavelength calibration
 
-fit_order = 4
+fit_order = 3
 #5 of hoger valt buiten 
 fit_1 = np.polynomial.polynomial.polyfit(x_list,wavelength_list,fit_order,w=uncertainty_x)
-print(fit_1)
 
 # x & y coordinaten van de fit
 wavelength_object = []
@@ -150,6 +160,7 @@ for i, x_value in enumerate(x_list):
     residuals.append(residual)
     
 # lekker plotten:
+'''
 
 fig, (ax1, ax2) = plt.subplots(2,1, sharex=True, gridspec_kw={'height_ratios': [7, 2]})
 fig.subplots_adjust(hspace=0)
@@ -174,12 +185,13 @@ for index in range(len(x_list)):
 plt.legend()
 plt.show()
 
+'''
 
 
 # %% first order flux correction:
-
+'''
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
+plt.plot(wavelength_object, (flux_object_A - dark_A)/(tungstenflat_A-darkflat_A))
 plt.ylim(0,)
 plt.show()
 
@@ -187,7 +199,7 @@ plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B))
 plt.ylim(0,)
 plt.show()
-
+'''
 # %% Nu aan jullie om lekker te normaliseren:
 
 fit_order_norm = 10
@@ -218,81 +230,112 @@ for x in wavelength_object:
 flux_object_norm_A = (flux_object_A-dark_A)/((tungstenflat_A-darkflat_A)*normalisation_fit_A)
 flux_object_norm_B = (flux_object_B-dark_B)/((tungstenflat_B-darkflat_B)*normalisation_fit_B)
 
-H_alpha_A_wavelength = []
-H_alpha_A_intensity = []
-H_alpha_B_wavelength = []
-H_alpha_B_intensity = []
 
+#Natrium lijn D1 fitfunctie
+Na_D1_A_wavelength = []
+Na_D1_A_intensity = []
+Na_D1_B_wavelength = []
+Na_D1_B_intensity = []
+Na_D1_A_error = []
+Na_D1_B_error = []
+Na_D2_A_error = []
+Na_D2_B_error = []
 
 for i in range(len(wavelength_object)):
-    if 6562.1 < wavelength_object[i] < 6563.6:
-        H_alpha_A_wavelength.append(wavelength_object[i])
-        H_alpha_A_intensity.append(flux_object_norm_A[i])
-        H_alpha_B_wavelength.append(wavelength_object[i])
-        H_alpha_B_intensity.append(flux_object_norm_B[i])
+    if 5895.8 < wavelength_object[i] < 5896.55:
+        Na_D1_A_wavelength.append(wavelength_object[i])
+        Na_D1_A_intensity.append(flux_object_norm_A[i])
+        Na_D1_B_wavelength.append(wavelength_object[i])
+        Na_D1_B_intensity.append(flux_object_norm_B[i])
+        Na_D1_A_error.append(flux_object_norm_A[i]/SNR_A[i])
+        Na_D1_B_error.append(flux_object_norm_B[i]/SNR_B[i])
 
 
-fit_H_alpha_A= np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 5)
-H_alpha_A = []
-for x in H_alpha_A_wavelength:
-    y = 0
-    # Calculate y_coordinate
-    for n in range(len(fit_H_alpha_A)):
-        y += (fit_H_alpha_A[n] * (x)**n)
-    # Save coordinates
-    H_alpha_A.append(y) 
+#Natrium lijn D2 fitfunctie
+Na_D2_A_wavelength = []
+Na_D2_A_intensity = []
+Na_D2_B_wavelength = []
+Na_D2_B_intensity = []
 
-fit_H_alpha_B =  np.polynomial.polynomial.polyfit(H_alpha_B_wavelength,H_alpha_B_intensity, 5)
+for i in range(len(wavelength_object)):
+    if 5889.6 < wavelength_object[i] < 5890.6:
+        Na_D2_A_wavelength.append(wavelength_object[i])
+        Na_D2_A_intensity.append(flux_object_norm_A[i])
+        Na_D2_B_wavelength.append(wavelength_object[i])
+        Na_D2_B_intensity.append(flux_object_norm_B[i])
+        Na_D2_A_error.append(flux_object_norm_A[i]/SNR_A[i])
+        Na_D2_B_error.append(flux_object_norm_B[i]/SNR_B[i])
+
+def normal_distribution(x, std, avg, c):
+    return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
+
+popt_D1_A, pcov_D1_A = curve_fit(normal_distribution, Na_D1_A_wavelength, Na_D1_A_intensity, p0=[1, 5896.3, 1], sigma=Na_D1_A_error)
+std_opt_D1_A , avg_opt_D1_A, c_opt_D1_A= popt_D1_A
+error_std_cov_D1_A, error_avg_cov_D1_A, error_c_cov_D1_A = pcov_D1_A
+
+popt_D1_B, pcov_D1_B = curve_fit(normal_distribution, Na_D1_B_wavelength, Na_D1_B_intensity, p0=[1, 5896.3, 1], sigma=Na_D1_B_error)
+std_opt_D1_B , avg_opt_D1_B, c_opt_D1_B= popt_D1_B
+error_std_cov_D1_B, error_avg_cov_D1_B, error_c_cov_D1_B = pcov_D1_B
+
+popt_D2_A, pcov_D2_A = curve_fit(normal_distribution, Na_D2_A_wavelength, Na_D2_A_intensity, p0=[1, 5889.9, 1], sigma=Na_D2_A_error)
+std_opt_D2_A , avg_opt_D2_A, c_opt_D2_A= popt_D2_A
+error_std_cov_D2_A, error_avg_cov_D2_A, error_c_cov_D2_A = pcov_D2_A
+
+popt_D2_B, pcov_D2_B = curve_fit(normal_distribution, Na_D2_B_wavelength, Na_D2_B_intensity, p0=[1, 5889.9, 1], sigma=Na_D2_B_error)
+std_opt_D2_B , avg_opt_D2_B, c_opt_D2_B= popt_D2_B
+error_std_cov_D2_B, error_avg_cov_D2_B, error_c_cov_D2_B = pcov_D2_B
 
 
-H_alpha_B = []
-for x in H_alpha_B_wavelength:
-    y = 0
-    # Calculate y_coordinate
-    for n in range(len(fit_H_alpha_B)):
-        y += (fit_H_alpha_B[n] * (x)**n)
-    # Save coordinates
-    H_alpha_B.append(y) 
+
+
+
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-# plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
-plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
-# plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(H_alpha_A_wavelength, H_alpha_A, label='fitfunctie A', linewidth=1)
-# plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunctie B', linewidth=1)
-# plt.plot(wavelength_object, flux_object_norm_B)
+plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+
+plt.plot(Na_D1_A_wavelength, (normal_distribution(Na_D1_A_wavelength, std_opt_D1_A, avg_opt_D1_A, c_opt_D1_A)), label='Gaussische fitfunctie D1 A')
+plt.plot(Na_D1_B_wavelength, (normal_distribution(Na_D1_B_wavelength, std_opt_D1_B, avg_opt_D1_B, c_opt_D1_B)), label='Gaussische fitfunctie D1 B')
+
+plt.plot(Na_D2_A_wavelength, (normal_distribution(Na_D2_A_wavelength, std_opt_D2_A, avg_opt_D2_A, c_opt_D2_A)), label='Gaussische fitfunctie D2 A')
+plt.plot(Na_D2_B_wavelength, (normal_distribution(Na_D2_B_wavelength, std_opt_D2_B, avg_opt_D2_B, c_opt_D2_B)), label='Gaussische fitfunctie D2 B')
+
+
 plt.ylim(0,)
 plt.xlabel('Wavelenght (Angstrom)')
 plt.ylabel("Genormaliseerde Intensiteit")
-plt.legend()
+# plt.legend()
 plt.show()
 
-
-min_H_alpha_A=H_alpha_A_wavelength[np.where(H_alpha_A == min(H_alpha_A))[0][0]]
-min_H_alpha_B=H_alpha_B_wavelength[np.where(H_alpha_B == min(H_alpha_B))[0][0]]
-print(np.where(H_alpha_A == min(H_alpha_A))[0][0], min(H_alpha_A))
-print(f"De golflengte van H-alpha dataset A is {min_H_alpha_A}")
-print(np.where(H_alpha_B == min(H_alpha_B))[0][0], min(H_alpha_B))
-print(f"De golflengte van H-alpha dataset B is {min_H_alpha_B}")
-
-R=696340000
-c=299792458
-
-lambda0 = (min_H_alpha_B + min_H_alpha_A)/2
-delta_lambda = abs(min_H_alpha_B - lambda0)
-
-v = c* (delta_lambda/lambda0)
-
-print(lambda0, delta_lambda, v)
-
-
-T = ((2*np.pi*R)/v)
-print(f"{T} is de omlooptijd in seconden")
-print(f"{T/(60*60*24)} is de omlooptijd in dagen")
 
 
 
 # %%
+
+R=696342000
+error_R = 65000
+c=299792458
+
+
+#gaussian results 
+
+def omlooptijd_7(min_A_g, error_A_g, min_B_g, error_B_g):
+    lambda_gem = (min_A_g+min_B_g)/2
+    delta_lambda = abs(lambda_gem - min_A_g)
+    v = c * (delta_lambda/lambda_gem)
+    T = ((2*np.pi*R)/v)
+    print(f"{T/(60*60*24)} is de omlooptijd in dagen")
+
+    error_T = (((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2 +
+        ((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2 +
+        ((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)**(1/2)
+    print(f"{error_T/(60*60*24)} is de error van de omlooptijd in dagen")
+    return T, error_T
+omlooptijd_7(avg_opt_D1_A, pcov_D1_A[2][2]**(1/2), avg_opt_D1_B, pcov_D1_B[2][2]**(1/2))
+omlooptijd_7(avg_opt_D2_A, pcov_D2_A[2][2]**(1/2), avg_opt_D2_B, pcov_D2_B[2][2]**(1/2))
+
+def parameters_7():
+    return avg_opt_D1_A, pcov_D1_A[2][2]**(1/2), avg_opt_D1_B, pcov_D1_B[2][2]**(1/2), avg_opt_D2_A, pcov_D2_A[2][2]**(1/2), avg_opt_D2_B, pcov_D2_B[2][2]**(1/2)
 
 
 

@@ -127,14 +127,14 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5]
 
-'''
+
 plt.plot(x_pixelvalues_A,thar_A)
 plt.scatter(x_list,thar_A[x_list], c='red', label = 'calibration points' )
 for index in range(len(x_list)):
     plt.text(x_list[index]+20, thar_A[x_list][index]+20, wavelength_list[index], size=8)
 plt.legend()
 plt.show()
-'''
+
 # %% Polynomial fit for wavelength calibration
 
 fit_order = 4
@@ -242,23 +242,33 @@ H_alpha_A_error = []
 H_alpha_B_error = []
 
 for i in range(len(wavelength_object)):
-    if 6561.9 < wavelength_object[i] < 6563.6:
+    if 6561.83 < wavelength_object[i] < 6563.63:
         H_alpha_A_wavelength.append(wavelength_object[i])
         H_alpha_A_intensity.append(flux_object_norm_A[i])
+        H_alpha_A_error.append(flux_object_norm_A[i]/SNR_A[i])
+
+for i in range(len(wavelength_object)):
+    if 6561.89 < wavelength_object[i] < 6563.68:
         H_alpha_B_wavelength.append(wavelength_object[i])
         H_alpha_B_intensity.append(flux_object_norm_B[i])
-        H_alpha_A_error.append(flux_object_norm_A[i]/SNR_A[i])
         H_alpha_B_error.append(flux_object_norm_B[i]/SNR_B[i])
 
+def normal_distribution(x, std, avg, c):
+    return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
 
-def normal_distribution(x, std, avg):
-    return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+1
+popt_n_A, pcov_n_A = curve_fit(normal_distribution, H_alpha_A_wavelength, H_alpha_A_intensity, p0=[1, 6562.7, 1], sigma=H_alpha_A_error)
+std_opt_A , avg_opt_A, c_opt_A= popt_n_A
+error_std_cov_A, error_avg_cov_A, error_c_cov_A = pcov_n_A
+print(f'minimum gaussische functie {avg_opt_A}')
+print(f'sqrt variantie en sigma std{(pcov_n_A[0][0]**(1/2)), std_opt_A}')
 
-popt_n, pcov_n = curve_fit(normal_distribution, H_alpha_A_wavelength, H_alpha_A_intensity, p0=[2, 6562.7], sigma=H_alpha_A_error)
-std_opt , avg_opt = popt_n
-error_std_cov, error_avg_cov = pcov_n
-print(f'minimum gaussische functie {avg_opt}')
-print(f'sqrt variantie en sigma std{(pcov_n[0][0]**(1/2)), std_opt}')
+popt_n_B, pcov_n_B = curve_fit(normal_distribution, H_alpha_B_wavelength, H_alpha_B_intensity, p0=[1, 6562.7, 1], sigma=H_alpha_B_error)
+std_opt_B , avg_opt_B, c_opt_B= popt_n_B
+error_std_cov_B, error_avg_cov_B, error_c_cov_B = pcov_n_B
+print(f'minimum gaussische functie {avg_opt_B}')
+print(f'sqrt variantie en sigma std{(pcov_n_B[0][0]**(1/2)), std_opt_B}')
+
+
 def second_orde_poly(x, a, b, lambda_0):
     return a*(x-lambda_0)**2 + b
 
@@ -266,42 +276,19 @@ popt_p, pcov_p = curve_fit(second_orde_poly, H_alpha_A_wavelength, H_alpha_A_int
 a_opt, b_opt, lambda_0_opt = popt_p
 print(f'minimum polynoom functie {lambda_0_opt}')
 print(f'sqrt variantie lambda 0 {(pcov_p[2][2]**(1/2))}')
-print(f"verschil tussen fitfuncties: {lambda_0_opt-avg_opt}")
-
-fit_H_alpha_A = np.polynomial.polynomial.polyfit(H_alpha_A_wavelength,H_alpha_A_intensity, 2)
-
-H_alpha_A = []
-for x in H_alpha_A_wavelength:
-    y = 0
-    # Calculate y_coordinate
-    for n in range(len(fit_H_alpha_A)):
-        y += (fit_H_alpha_A[n] * (x)**n)
-    # Save coordinates
-    H_alpha_A.append(y) 
-
-fit_H_alpha_B =  np.polynomial.polynomial.polyfit(H_alpha_B_wavelength,H_alpha_B_intensity, 2)
-
-
-H_alpha_B = []
-for x in H_alpha_B_wavelength:
-    y = 0
-    # Calculate y_coordinate
-    for n in range(len(fit_H_alpha_B)):
-        y += (fit_H_alpha_B[n] * (x)**n)
-    # Save coordinates
-    H_alpha_B.append(y) 
+print(f"verschil tussen fitfuncties: {lambda_0_opt-avg_opt_A}")
 
 
 
 plt.subplots(figsize=(16.5, 11.7), dpi=300)
-# plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
-# plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(H_alpha_A_wavelength, (normal_distribution(H_alpha_A_wavelength, std_opt, avg_opt)), label='Gaussische fitfunctie')
-plt.plot(H_alpha_A_wavelength, (second_orde_poly(H_alpha_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
+plt.plot(H_alpha_A_wavelength, (normal_distribution(H_alpha_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
+plt.plot(H_alpha_B_wavelength, (normal_distribution(H_alpha_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
+
+# plt.plot(H_alpha_A_wavelength, (second_orde_poly(H_alpha_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
 plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
-# plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunctie B', linewidth=1)
-# plt.plot(wavelength_object, flux_object_norm_B)
+plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
 plt.ylim(0,)
 plt.xlabel('Wavelenght (Angstrom)')
 plt.ylabel("Genormaliseerde Intensiteit")
@@ -310,32 +297,37 @@ plt.show()
 
 
 
-min_H_alpha_A=H_alpha_A_wavelength[np.where(H_alpha_A == min(H_alpha_A))[0][0]]
-min_H_alpha_B=H_alpha_B_wavelength[np.where(H_alpha_B == min(H_alpha_B))[0][0]]
-print(np.where(H_alpha_A == min(H_alpha_A))[0][0], min(H_alpha_A))
-print(f"De golflengte van H-alpha dataset A is {min_H_alpha_A}")
-print(np.where(H_alpha_B == min(H_alpha_B))[0][0], min(H_alpha_B))
-print(f"De golflengte van H-alpha dataset B is {min_H_alpha_B}")
 
-R=696340000
-c=299792458
-
-lambda0 = (min_H_alpha_B + min_H_alpha_A)/2
-delta_lambda = abs(min_H_alpha_B - lambda0)
-
-v = c* (delta_lambda/lambda0)
-
-print(lambda0, delta_lambda, v)
-
-
-T = ((2*np.pi*R)/v)
-print(f"{T} is de omlooptijd in seconden")
-print(f"{T/(60*60*24)} is de omlooptijd in dagen")
 
 
 # %%
+R=696342000
+error_R = 65000
+c=299792458
+error_c = 1
 
+#gaussian results 
 
+min_A_g = avg_opt_A 
+error_A_g = pcov_n_A[2][2]**(1/2)
+
+min_B_g = avg_opt_B
+error_B_g = pcov_n_B[2][2]**(1/2)
+
+#polynomial result
+
+min_A_p = lambda_0_opt
+error_A_p = pcov_p[2][2]**(1/2)
+
+def omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g):
+    lambda_gem = (min_A_g+min_B_g)/2
+    delta_lambda_1 = abs(lambda_gem - min_A_g)
+    v = c * (delta_lambda_1/lambda_gem)
+    T = ((2*np.pi*R)/v)
+    print(f"{T} is de omlooptijd in seconden")
+    print(f"{T/(60*60*24)} is de omlooptijd in dagen")
+
+omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g)
 
 
 

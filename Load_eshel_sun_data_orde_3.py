@@ -127,13 +127,14 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5]
 
-
+'''
 plt.plot(x_pixelvalues_A,thar_A)
 plt.scatter(x_list,thar_A[x_list], c='red', label = 'calibration points' )
 for index in range(len(x_list)):
     plt.text(x_list[index]+20, thar_A[x_list][index]+20, wavelength_list[index], size=8)
 plt.legend()
 plt.show()
+'''
 
 # %% Polynomial fit for wavelength calibration
 
@@ -319,15 +320,25 @@ error_B_g = pcov_n_B[2][2]**(1/2)
 min_A_p = lambda_0_opt
 error_A_p = pcov_p[2][2]**(1/2)
 
+t_formule = (2*np.pi*R/c)*(min_A_g +min_B_g)/(min_B_g - min_A_g)
 def omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g):
     lambda_gem = (min_A_g+min_B_g)/2
-    delta_lambda_1 = abs(lambda_gem - min_A_g)
-    v = c * (delta_lambda_1/lambda_gem)
+    delta_lambda = abs(lambda_gem - min_A_g)
+    v = c * (delta_lambda/lambda_gem)
     T = ((2*np.pi*R)/v)
     print(f"{T} is de omlooptijd in seconden")
     print(f"{T/(60*60*24)} is de omlooptijd in dagen")
 
+    error_T = (((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2 +
+        ((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2 +
+        ((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)**(1/2)
+    print(f"{error_T} is de error van de omlooptijd in seconden")
+    print(f"{error_T/(60*60*24)} is de error van de omlooptijd in dagen")
+    print(((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2)
+    print(((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2)
+    print(((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)
 omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g)
+
 
 
 

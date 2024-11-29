@@ -88,17 +88,25 @@ wavelength_list =   [5162.2845,
                      5151.612,
                      5145.3082,
                      5141.7827,
-                     5187.7462]
+                     5187.7462,
+                     5177.6227,
+                    5125.7654,
+                    5115.0448,
+                    5090.495,
+                    5067.9737]
 
 x_list =            [1704,
                      1814,
                      1940,
-                     2021,
+                     2020,
                      2197,
                      2297,
                      938,
-
-                      ]
+                    1248,
+                    2745,
+                    3039,
+                    3696,
+                    4279]
 
 uncertainty_x =     [0.5,
                      0.5,
@@ -107,7 +115,11 @@ uncertainty_x =     [0.5,
                      0.5,
                      0.5,
                      0.5,
-                    ]
+                     0.5,
+                     0.5,
+                     0.5,
+                     0.5,
+                     0.5]
 
 #calibration points
 plt.plot(x_pixelvalues_A,thar_A)
@@ -119,7 +131,7 @@ plt.show()
 
 # %% Polynomial fit for wavelength calibration
 
-fit_order = 4
+fit_order = 2
 #5 of hoger valt buiten 
 fit_1 = np.polynomial.polynomial.polyfit(x_list,wavelength_list,fit_order,w=uncertainty_x)
 
@@ -211,129 +223,53 @@ for x in wavelength_object:
 flux_object_norm_A = (flux_object_A-dark_A)/((tungstenflat_A-darkflat_A)*normalisation_fit_A)
 flux_object_norm_B = (flux_object_B-dark_B)/((tungstenflat_B-darkflat_B)*normalisation_fit_B)
 
-Na_D1_A_wavelength = []
-Na_D1_A_intensity = []
-Na_D1_B_wavelength = []
-Na_D1_B_intensity = []
+#%%
+Mg_b1_A_wavelength = []
+Mg_b1_A_intensity = []
+Mg_b1_B_wavelength = []
+Mg_b1_B_intensity = []
 
-# calculate rotztion period with Na-D1
+# calculate rotztion period with Mg-b1
 for i in range(len(wavelength_object)):
-    if 5889.9 < wavelength_object[i] < 5891.0:
-        Na_D1_A_wavelength.append(wavelength_object[i])
-        Na_D1_A_intensity.append(flux_object_norm_A[i])
-        Na_D1_B_wavelength.append(wavelength_object[i])
-        Na_D1_B_intensity.append(flux_object_norm_B[i])
+    if 5183 < wavelength_object[i] < 5184:
+        Mg_b1_A_wavelength.append(wavelength_object[i])
+        Mg_b1_A_intensity.append(flux_object_norm_A[i])
+        Mg_b1_B_wavelength.append(wavelength_object[i])
+        Mg_b1_B_intensity.append(flux_object_norm_B[i])
 
 
-fit_Na_D1_A= np.polynomial.polynomial.polyfit(Na_D1_A_wavelength,Na_D1_A_intensity, 5)
-Na_D1_A = []
-for x in Na_D1_A_wavelength:
+fit_Mg_b1_A= np.polynomial.polynomial.polyfit(Mg_b1_A_wavelength,Mg_b1_A_intensity, 5)
+Mg_b1_A = []
+for x in Mg_b1_A_wavelength:
     y = 0
     # Calculate y_coordinate
-    for n in range(len(fit_Na_D1_A)):
-        y += (fit_Na_D1_A[n] * (x)**n)
+    for n in range(len(fit_Mg_b1_A)):
+        y += (fit_Mg_b1_A[n] * (x)**n)
     # Save coordinates
-    Na_D1_A.append(y) 
+    Mg_b1_A.append(y) 
 
-fit_Na_D1_B =  np.polynomial.polynomial.polyfit(Na_D1_B_wavelength,Na_D1_B_intensity, 5)
-Na_D1_B = []
-for x in Na_D1_B_wavelength:
+fit_Mg_b1_B =  np.polynomial.polynomial.polyfit(Mg_b1_B_wavelength,Mg_b1_B_intensity, 5)
+Mg_b1_B = []
+for x in Mg_b1_B_wavelength:
     y = 0
     # Calculate y_coordinate
-    for n in range(len(fit_Na_D1_B)):
-        y += (fit_Na_D1_B[n] * (x)**n)
+    for n in range(len(fit_Mg_b1_B)):
+        y += (fit_Mg_b1_B[n] * (x)**n)
     # Save coordinates
-    Na_D1_B.append(y) 
-
-#Na-D1
-plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Na-D1 A')
-plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Na-D1 B')
-plt.legend()
-plt.show()
-
-plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'lightblue')
-plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'blue')
-plt.plot(Na_D1_A_wavelength, Na_D1_A, label='fitfunctie A', linewidth=1, color = 'yellow')
-plt.plot(Na_D1_B_wavelength, Na_D1_B, label='fitfunctie B', linewidth=1, color = 'orange')
-plt.plot(wavelength_object, flux_object_norm_B)
-plt.ylim(0,)
-plt.xlabel('Wavelength (Angstrom)')
-plt.ylabel("Genormaliseerde Intensiteit")
-plt.legend()
-plt.show()
-
-
-min_Na_D1_A=Na_D1_A_wavelength[np.where(Na_D1_A == min(Na_D1_A))[0][0]]
-min_Na_D1_B=Na_D1_B_wavelength[np.where(Na_D1_B == min(Na_D1_B))[0][0]]
-print(np.where(Na_D1_A == min(Na_D1_A))[0][0], min(Na_D1_A))
-print(f"De golflengte van Na-D1 dataset A is {min_Na_D1_A}")
-print(np.where(Na_D1_B == min(Na_D1_B))[0][0], min(Na_D1_B))
-print(f"De golflengte van Na-D1 dataset B is {min_Na_D1_B}")
-
-R=696340000
-c=299792458
-
-lambda_gem_1 = (min_Na_D1_B + min_Na_D1_A)/2
-delta_lambda_1 = abs(min_Na_D1_B - lambda_gem_1)
-
-v_1 = c* (delta_lambda_1/lambda_gem_1)
-
-print(lambda_gem_1, delta_lambda_1, v_1)
-
-
-T_1 = ((2*np.pi*R)/v_1)
-print(f"{T_1} is the rotation time in seconds  calculated from Na-D1 line")
-print(f"{T_1/(60*60*24)} is the rotation time in days  calculated from Na-D1 line")
-
-# %%
-Na_D2_A_wavelength = []
-Na_D2_A_intensity = []
-Na_D2_B_wavelength = []
-Na_D2_B_intensity = []
-
-# calculate rotztion period with Na-D2
-for i in range(len(wavelength_object)):
-    if 5895.9 < wavelength_object[i] < 5896.6:
-        Na_D2_A_wavelength.append(wavelength_object[i])
-        Na_D2_A_intensity.append(flux_object_norm_A[i])
-        Na_D2_B_wavelength.append(wavelength_object[i])
-        Na_D2_B_intensity.append(flux_object_norm_B[i])
-
-
-fit_Na_D2_A= np.polynomial.polynomial.polyfit(Na_D2_A_wavelength,Na_D2_A_intensity, 5)
-Na_D2_A = []
-for x in Na_D2_A_wavelength:
-    y = 0
-    # Calculate y_coordinate
-    for n in range(len(fit_Na_D2_A)):
-        y += (fit_Na_D2_A[n] * (x)**n)
-    # Save coordinates
-    Na_D2_A.append(y) 
-
-fit_Na_D2_B =  np.polynomial.polynomial.polyfit(Na_D2_B_wavelength,Na_D2_B_intensity, 5)
-Na_D2_B = []
-for x in Na_D2_B_wavelength:
-    y = 0
-    # Calculate y_coordinate
-    for n in range(len(fit_Na_D2_B)):
-        y += (fit_Na_D2_B[n] * (x)**n)
-    # Save coordinates
-    Na_D2_B.append(y) 
+    Mg_b1_B.append(y) 
 
 #Na-D2
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Na-D2 A')
-plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Na-D2 B')
+plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Mg-b1 A')
+plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Mg-b1 B')
 plt.legend()
 plt.show()
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'green')
 plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'lime')
-plt.plot(Na_D2_A_wavelength, Na_D2_A, label='fitfunction A', linewidth=1, color = 'crimson')
-plt.plot(Na_D2_B_wavelength, Na_D2_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
+plt.plot(Mg_b1_A_wavelength, Mg_b1_A, label='fitfunction A', linewidth=1, color = 'crimson')
+plt.plot(Mg_b1_B_wavelength, Mg_b1_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
 plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
 plt.xlabel('Wavelength (Angstrom)')
@@ -342,18 +278,95 @@ plt.legend()
 plt.show()
 
 
-min_Na_D2_A=Na_D2_A_wavelength[np.where(Na_D2_A == min(Na_D2_A))[0][0]]
-min_Na_D2_B=Na_D2_B_wavelength[np.where(Na_D2_B == min(Na_D2_B))[0][0]]
-print(np.where(Na_D2_A == min(Na_D2_A))[0][0], min(Na_D2_A))
-print(f"The wavelegth of Na-D2  in dataset A is {min_Na_D2_A}")
-print(np.where(Na_D2_B == min(Na_D2_B))[0][0], min(Na_D2_B))
-print(f"The wavelength of Na-D2 in dataset B is {min_Na_D2_B}")
+min_Mg_b1_A=Mg_b1_A_wavelength[np.where(Mg_b1_A == min(Mg_b1_A))[0][0]]
+min_Mg_b1_B=Mg_b1_B_wavelength[np.where(Mg_b1_B == min(Mg_b1_B))[0][0]]
+print(np.where(Mg_b1_A == min(Mg_b1_A))[0][0], min(Mg_b1_A))
+print(f"The wavelegth of Mg_b1  in dataset A is {min_Mg_b1_A}")
+print(np.where(Mg_b1_B == min(Mg_b1_B))[0][0], min(Mg_b1_B))
+print(f"The wavelength of Mg_b1 in dataset B is {min_Mg_b1_B}")
 
 R=696340000
 c=299792458
 
-lambda_gem_2 = (min_Na_D2_B + min_Na_D2_A)/2
-delta_lambda_2 = abs(min_Na_D2_B - lambda_gem_2)
+lambda_gem_1 = (min_Mg_b1_B + min_Mg_b1_A)/2
+delta_lambda_1 = abs(min_Mg_b1_B - lambda_gem_1)
+
+v_1 = c* (delta_lambda_1/lambda_gem_1)
+
+print(lambda_gem_1, delta_lambda_1, v_1)
+
+
+T_1 = ((2*np.pi*R)/v_1)
+print(f"{T_1} is the rotation time in seconds  calculated from Mg_b1 line")
+print(f"{T_1/(60*60*24)}is the rotation time in days  calculated from Mg_b1 line")
+
+#%%
+Mg_b2_A_wavelength = []
+Mg_b2_A_intensity = []
+Mg_b2_B_wavelength = []
+Mg_b2_B_intensity = []
+
+# calculate rotztion period with Mg_b2
+for i in range(len(wavelength_object)):
+    if 5172.3< wavelength_object[i] < 5173.1:
+        Mg_b2_A_wavelength.append(wavelength_object[i])
+        Mg_b2_A_intensity.append(flux_object_norm_A[i])
+        Mg_b2_B_wavelength.append(wavelength_object[i])
+        Mg_b2_B_intensity.append(flux_object_norm_B[i])
+
+
+fit_Mg_b2_A= np.polynomial.polynomial.polyfit(Mg_b2_A_wavelength,Mg_b2_A_intensity, 5)
+Mg_b2_A = []
+for x in Mg_b2_A_wavelength:
+    y = 0
+    # Calculate y_coordinate
+    for n in range(len(fit_Mg_b2_A)):
+        y += (fit_Mg_b2_A[n] * (x)**n)
+    # Save coordinates
+    Mg_b2_A.append(y) 
+
+fit_Mg_b2_B =  np.polynomial.polynomial.polyfit(Mg_b2_B_wavelength,Mg_b2_B_intensity, 5)
+Mg_b2_B = []
+for x in Mg_b2_B_wavelength:
+    y = 0
+    # Calculate y_coordinate
+    for n in range(len(fit_Mg_b2_B)):
+        y += (fit_Mg_b2_B[n] * (x)**n)
+    # Save coordinates
+    Mg_b2_B.append(y) 
+
+#Na-D2
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Mg_b2 A')
+plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Mg_b2 B')
+plt.legend()
+plt.show()
+
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'green')
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'lime')
+plt.plot(Mg_b2_A_wavelength, Mg_b2_A, label='fitfunction A', linewidth=1, color = 'crimson')
+plt.plot(Mg_b2_B_wavelength, Mg_b2_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
+plt.plot(wavelength_object, flux_object_norm_B)
+plt.ylim(0,)
+plt.xlabel('Wavelength (Angstrom)')
+plt.ylabel("Normalized intensity")
+plt.legend()
+plt.show()
+
+
+min_Mg_b2_A=Mg_b2_A_wavelength[np.where(Mg_b2_A == min(Mg_b2_A))[0][0]]
+min_Mg_b2_B=Mg_b2_B_wavelength[np.where(Mg_b2_B == min(Mg_b2_B))[0][0]]
+print(np.where(Mg_b2_A == min(Mg_b2_A))[0][0], min(Mg_b2_A))
+print(f"The wavelegth of Mg_b2  in dataset A is {min_Mg_b2_A}")
+print(np.where(Mg_b2_B == min(Mg_b2_B))[0][0], min(Mg_b2_B))
+print(f"The wavelength of Mg_b2 in dataset B is {min_Mg_b2_B}")
+
+R=696340000
+c=299792458
+
+lambda_gem_2 = (min_Mg_b2_B + min_Mg_b2_A)/2
+delta_lambda_2 = abs(min_Mg_b2_B - lambda_gem_2)
 
 v_2 = c* (delta_lambda_2/lambda_gem_2)
 
@@ -361,8 +374,87 @@ print(lambda_gem_2, delta_lambda_2, v_2)
 
 
 T_2 = ((2*np.pi*R)/v_2)
-print(f"{T_2} is the rotation time in seconds  calculated from Na-D2 line")
-print(f"{T_2/(60*60*24)}is the rotation time in days  calculated from Na-D2 line")
+print(f"{T_2} is the rotation time in seconds  calculated from Mg_b2 line")
+print(f"{T_2/(60*60*24)}is the rotation time in days  calculated from Mg_b2 line")
+
+#%%
+Mg_b3_A_wavelength = []
+Mg_b3_A_intensity = []
+Mg_b3_B_wavelength = []
+Mg_b3_B_intensity = []
+
+# calculate rotztion period with Mg_b3
+for i in range(len(wavelength_object)):
+    if 5167.0 < wavelength_object[i] < 5167.7:
+        Mg_b3_A_wavelength.append(wavelength_object[i])
+        Mg_b3_A_intensity.append(flux_object_norm_A[i])
+        Mg_b3_B_wavelength.append(wavelength_object[i])
+        Mg_b3_B_intensity.append(flux_object_norm_B[i])
+
+
+fit_Mg_b3_A= np.polynomial.polynomial.polyfit(Mg_b3_A_wavelength,Mg_b3_A_intensity, 5)
+Mg_b3_A = []
+for x in Mg_b3_A_wavelength:
+    y = 0
+    # Calculate y_coordinate
+    for n in range(len(fit_Mg_b3_A)):
+        y += (fit_Mg_b3_A[n] * (x)**n)
+    # Save coordinates
+    Mg_b3_A.append(y) 
+
+fit_Mg_b3_B =  np.polynomial.polynomial.polyfit(Mg_b3_B_wavelength,Mg_b3_B_intensity, 5)
+Mg_b3_B = []
+for x in Mg_b3_B_wavelength:
+    y = 0
+    # Calculate y_coordinate
+    for n in range(len(fit_Mg_b3_B)):
+        y += (fit_Mg_b3_B[n] * (x)**n)
+    # Save coordinates
+    Mg_b3_B.append(y) 
+
+#Na-D2
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Mg_b3 A')
+plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Mg_b3 B')
+plt.legend()
+plt.show()
+
+plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'green')
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'lime')
+plt.plot(Mg_b3_A_wavelength, Mg_b3_A, label='fitfunction A', linewidth=1, color = 'crimson')
+plt.plot(Mg_b3_B_wavelength, Mg_b3_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
+plt.plot(wavelength_object, flux_object_norm_B)
+plt.ylim(0,)
+plt.xlabel('Wavelength (Angstrom)')
+plt.ylabel("Normalized intensity")
+plt.legend()
+plt.show()
+
+
+min_Mg_b3_A=Mg_b3_A_wavelength[np.where(Mg_b3_A == min(Mg_b3_A))[0][0]]
+min_Mg_b3_B=Mg_b3_B_wavelength[np.where(Mg_b3_B == min(Mg_b3_B))[0][0]]
+print(np.where(Mg_b3_A == min(Mg_b3_A))[0][0], min(Mg_b3_A))
+print(f"The wavelegth of Mg_b3  in dataset A is {min_Mg_b3_A}")
+print(np.where(Mg_b3_B == min(Mg_b3_B))[0][0], min(Mg_b3_B))
+print(f"The wavelength of Mg_b3 in dataset B is {min_Mg_b3_B}")
+
+R=696340000
+c=299792458
+
+lambda_gem_3 = (min_Mg_b3_B + min_Mg_b3_A)/2
+delta_lambda_3 = abs(min_Mg_b3_B - lambda_gem_3)
+
+v_3 = c* (delta_lambda_2/lambda_gem_2)
+
+print(lambda_gem_2, delta_lambda_2, v_3)
+
+
+T_3 = ((2*np.pi*R)/v_3)
+print(f"{T_3} is the rotation time in seconds  calculated from Mg_b3 line")
+print(f"{T_3/(60*60*24)}is the rotation time in days  calculated from Mg_b3 line")
+
+
 
 
 

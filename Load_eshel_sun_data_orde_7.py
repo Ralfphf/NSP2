@@ -141,7 +141,6 @@ for x in x_pixelvalues_A:
     wavelength_object.append(y)   
 
 #  Residuals berekenen
-
 residuals = []
 for i, x_value in enumerate(x_list):
     # Bereken de voorspelde waarde met de fit-coëfficiënten
@@ -162,9 +161,8 @@ ax1.set_ylabel("Wavelength [Angstrom]")
 ax1.errorbar(x_list, wavelength_list, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 ax1.scatter(x_list,wavelength_list, c='blue')
 
-# mijn errorbars werken nog niet goed
-ax2.scatter(x_list,residuals)
 ax2.errorbar(x_list, residuals, yerr=np.abs(uncertainty_x*np.array(fit_1[1])), fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
+ax2.scatter(x_list,residuals)
 ax2.set_xlabel("Pixels")
 ax2.set_ylabel("Residuals [Angstrom]")
 ax2.axhline(0, color='black', linestyle='--', linewidth=1, label = 'model')
@@ -219,7 +217,7 @@ for x in wavelength_object:
 
 flux_object_norm_A = (flux_object_A-dark_A)/((tungstenflat_A-darkflat_A)*normalisation_fit_A)
 flux_object_norm_B = (flux_object_B-dark_B)/((tungstenflat_B-darkflat_B)*normalisation_fit_B)
-
+#%%
 Na_D1_A_wavelength = []
 Na_D1_A_intensity = []
 Na_D1_B_wavelength = []

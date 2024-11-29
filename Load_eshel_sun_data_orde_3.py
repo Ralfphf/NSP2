@@ -312,7 +312,7 @@ plt.plot(H_alpha_B_wavelength, H_alpha_B, label='fitfunction B', linewidth=1)
 plt.ylim(0,)
 plt.xlabel('Wavelength (Angstrom)')
 plt.ylabel("Normalized Intensity")
-plt.legend()
+plt.legend(loc = 4,prop={'size': 6})
 plt.show()
 
 #the fitted wavelength of A and B

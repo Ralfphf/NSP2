@@ -17,7 +17,7 @@ from scipy.optimize import curve_fit
 from scipy import signal
 from pathlib import Path
 from tqdm import tqdm
-# %%
+# %
 
 
 # The following code can be used to load the flux data from an order:
@@ -184,11 +184,13 @@ plt.show()
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A))
+plt.title('Limb A') #verwijder voor verslag
 plt.ylim(0,)
 plt.show()
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B))
+plt.title('Limb B') # verwijder voor verslag
 plt.ylim(0,)
 plt.show()
 
@@ -223,34 +225,40 @@ for x in wavelength_object:
 flux_object_norm_A = (flux_object_A-dark_A)/((tungstenflat_A-darkflat_A)*normalisation_fit_A)
 flux_object_norm_B = (flux_object_B-dark_B)/((tungstenflat_B-darkflat_B)*normalisation_fit_B)
 
+
 #%%
 Mg_b1_A_wavelength = []
 Mg_b1_A_intensity = []
+Mg_b1_A_error = []
+
 Mg_b1_B_wavelength = []
 Mg_b1_B_intensity = []
-Mg_b1_A_error = []
 Mg_b1_B_error = []
 
-# calculate rotztion period with Mg-b1
+# calculate rotation period with Mg-b1
 for i in range(len(wavelength_object)):
-    if 5183 < wavelength_object[i] < 5184:
+    if 5183.1 < wavelength_object[i] < 5184.0:
         Mg_b1_A_wavelength.append(wavelength_object[i])
         Mg_b1_A_intensity.append(flux_object_norm_A[i])
         Mg_b1_A_error.append(flux_object_norm_A[i]/SNR_A[i])
-        Mg_b1_B_wavelength.append(wavelength_object[i])
-        Mg_b1_B_intensity.append(flux_object_norm_B[i])
-        Mg_b1_B_error.append(flux_object_norm_B[i]/SNR_B[i])
+
+for i in range(len(wavelength_object)):
+        if 5183.3 < wavelength_object[i] < 5184.0:
+            Mg_b1_B_wavelength.append(wavelength_object[i])
+            Mg_b1_B_intensity.append(flux_object_norm_B[i])
+            Mg_b1_B_error.append(flux_object_norm_B[i]/SNR_B[i])
+
 
 def normal_distribution(x, std, avg, c):
     return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
 
-popt_n_A, pcov_n_A = curve_fit(normal_distribution, Mg_b1_A_wavelength, Mg_b1_A_intensity, p0=[1, 6562.7, 1], sigma=Mg_b1_A_error)
+popt_n_A, pcov_n_A = curve_fit(normal_distribution, Mg_b1_A_wavelength, Mg_b1_A_intensity, p0=[1, 5183, 1], sigma=Mg_b1_A_error)
 std_opt_A , avg_opt_A, c_opt_A= popt_n_A
 error_std_cov_A, error_avg_cov_A, error_c_cov_A = pcov_n_A
 print(f'minimum gaussische functie {avg_opt_A}')
 print(f'sqrt variantie en sigma std{(pcov_n_A[0][0]**(1/2)), std_opt_A}')
 
-popt_n_B, pcov_n_B = curve_fit(normal_distribution, Mg_b1_B_wavelength, Mg_b1_B_intensity, p0=[1, 6562.7, 1], sigma=Mg_b1_B_error)
+popt_n_B, pcov_n_B = curve_fit(normal_distribution, Mg_b1_B_wavelength, Mg_b1_B_intensity, p0=[1, 5183, 1], sigma=Mg_b1_B_error)
 std_opt_B , avg_opt_B, c_opt_B= popt_n_B
 error_std_cov_B, error_avg_cov_B, error_c_cov_B = pcov_n_B
 print(f'minimum gaussische functie {avg_opt_B}')
@@ -290,12 +298,8 @@ plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_
 plt.ylim(0,)
 plt.xlabel('Wavelength (Angstrom)')
 plt.ylabel("Normalized intensity")
-plt.legend()
+plt.legend(loc=2, prop={'size': 6})
 plt.show()
-
-
-
-
 
 #####
 """
@@ -318,43 +322,83 @@ plt.legend()
 plt.show()
 """
 
-min_Mg_b1_A=Mg_b1_A_wavelength[np.where(Mg_b1_A == min(Mg_b1_A))[0][0]]
-min_Mg_b1_B=Mg_b1_B_wavelength[np.where(Mg_b1_B == min(Mg_b1_B))[0][0]]
-print(np.where(Mg_b1_A == min(Mg_b1_A))[0][0], min(Mg_b1_A))
-print(f"The wavelegth of Mg_b1  in dataset A is {min_Mg_b1_A}")
-print(np.where(Mg_b1_B == min(Mg_b1_B))[0][0], min(Mg_b1_B))
-print(f"The wavelength of Mg_b1 in dataset B is {min_Mg_b1_B}")
-
-R=696340000
+R=696342000
+error_R = 65000
 c=299792458
+error_c = 1
 
-lambda_gem_1 = (min_Mg_b1_B + min_Mg_b1_A)/2
-delta_lambda_1 = abs(min_Mg_b1_B - lambda_gem_1)
+#gaussian results 
 
-v_1 = c* (delta_lambda_1/lambda_gem_1)
+min_A_g = avg_opt_A 
+error_A_g = pcov_n_A[2][2]**(1/2)
 
-print(lambda_gem_1, delta_lambda_1, v_1)
+min_B_g = avg_opt_B
+error_B_g = pcov_n_B[2][2]**(1/2)
 
+#polynomial result
 
-T_1 = ((2*np.pi*R)/v_1)
-print(f"{T_1} is the rotation time in seconds  calculated from Mg_b1 line")
-print(f"{T_1/(60*60*24)}is the rotation time in days  calculated from Mg_b1 line")
+# min_A_p = lambda_0_opt
+# error_A_p = pcov_p[2][2]**(1/2)
+
+t_formule = (2*np.pi*R/c)*(min_A_g +min_B_g)/(min_B_g - min_A_g)
+def omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g):
+    lambda_gem = (min_A_g+min_B_g)/2
+    delta_lambda = abs(lambda_gem - min_A_g)
+    v = c * (delta_lambda/lambda_gem)
+    T = ((2*np.pi*R)/v)
+    print(f"{T} is the rotationperiod in seconds according to Mg_b1.")
+    print(f"{T/(60*60*24)} is the rotationperiod in days according to Mg_b1")
+
+    error_T = (((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2 +
+        ((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2 +
+        ((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)**(1/2)
+    print(f"{error_T} is the error on the rotationperiod in seconds according to Mg_b1")
+    print(f"{error_T/(60*60*24)} is the error on the rotationperiod in days according to Mg_b1")
+    print(((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2)
+    print(((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2)
+    print(((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)
+omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g)
 
 #%%
+
 Mg_b2_A_wavelength = []
 Mg_b2_A_intensity = []
+Mg_b2_A_error = []
+
 Mg_b2_B_wavelength = []
 Mg_b2_B_intensity = []
+Mg_b2_B_error = []
 
-# calculate rotztion period with Mg_b2
+# calculate rotation period with Mg-b1
 for i in range(len(wavelength_object)):
-    if 5172.3< wavelength_object[i] < 5173.1:
+    if 5172.25 < wavelength_object[i] < 5173.25:
         Mg_b2_A_wavelength.append(wavelength_object[i])
         Mg_b2_A_intensity.append(flux_object_norm_A[i])
-        Mg_b2_B_wavelength.append(wavelength_object[i])
-        Mg_b2_B_intensity.append(flux_object_norm_B[i])
+        Mg_b2_A_error.append(flux_object_norm_A[i]/SNR_A[i])
+
+for i in range(len(wavelength_object)):
+        if 5172.2 < wavelength_object[i] < 5173.3:
+            Mg_b2_B_wavelength.append(wavelength_object[i])
+            Mg_b2_B_intensity.append(flux_object_norm_B[i])
+            Mg_b2_B_error.append(flux_object_norm_B[i]/SNR_B[i])
 
 
+def normal_distribution(x, std, avg, c):
+    return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
+
+popt_n_A, pcov_n_A = curve_fit(normal_distribution, Mg_b2_A_wavelength, Mg_b2_A_intensity, p0=[1, 5172, 1], sigma=Mg_b2_A_error)
+std_opt_A , avg_opt_A, c_opt_A= popt_n_A
+error_std_cov_A, error_avg_cov_A, error_c_cov_A = pcov_n_A
+print(f'minimum gaussische functie {avg_opt_A}')
+print(f'sqrt variantie en sigma std{(pcov_n_A[0][0]**(1/2)), std_opt_A}')
+
+popt_n_B, pcov_n_B = curve_fit(normal_distribution, Mg_b2_B_wavelength, Mg_b2_B_intensity, p0=[1, 5172, 1], sigma=Mg_b2_B_error)
+std_opt_B , avg_opt_B, c_opt_B= popt_n_B
+error_std_cov_B, error_avg_cov_B, error_c_cov_B = pcov_n_B
+print(f'minimum gaussische functie {avg_opt_B}')
+print(f'sqrt variantie en sigma std{(pcov_n_B[0][0]**(1/2)), std_opt_B}')
+
+"""
 fit_Mg_b2_A= np.polynomial.polynomial.polyfit(Mg_b2_A_wavelength,Mg_b2_A_intensity, 5)
 Mg_b2_A = []
 for x in Mg_b2_A_wavelength:
@@ -374,64 +418,120 @@ for x in Mg_b2_B_wavelength:
         y += (fit_Mg_b2_B[n] * (x)**n)
     # Save coordinates
     Mg_b2_B.append(y) 
+"""
+#Mg_b2
+plt.subplots(figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
+plt.plot(Mg_b2_A_wavelength, (normal_distribution(Mg_b2_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
+plt.plot(Mg_b2_B_wavelength, (normal_distribution(Mg_b2_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
 
-#Na-D2
+# plt.plot(Mg_b2_A_wavelength, (second_orde_poly(Mg_b2_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
+plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+plt.ylim(0,)
+plt.xlabel('Wavelength (Angstrom)')
+plt.ylabel("Normalized intensity")
+plt.legend(loc=2, prop={'size': 6})
+plt.show()
+
+#####
+"""
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Mg_b2 A')
-plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Mg_b2 B')
+plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Mg-b1 A')
+plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Mg-b1 B')
 plt.legend()
 plt.show()
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'green')
 plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'lime')
-plt.plot(Mg_b2_A_wavelength, Mg_b2_A, label='fitfunction A', linewidth=1, color = 'crimson')
-plt.plot(Mg_b2_B_wavelength, Mg_b2_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
+# plt.plot(Mg_b2_A_wavelength, Mg_b2_A, label='fitfunction A', linewidth=1, color = 'crimson')
+# plt.plot(Mg_b2_B_wavelength, Mg_b2_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
 plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
 plt.xlabel('Wavelength (Angstrom)')
 plt.ylabel("Normalized intensity")
 plt.legend()
 plt.show()
+"""
 
-
-min_Mg_b2_A=Mg_b2_A_wavelength[np.where(Mg_b2_A == min(Mg_b2_A))[0][0]]
-min_Mg_b2_B=Mg_b2_B_wavelength[np.where(Mg_b2_B == min(Mg_b2_B))[0][0]]
-print(np.where(Mg_b2_A == min(Mg_b2_A))[0][0], min(Mg_b2_A))
-print(f"The wavelegth of Mg_b2  in dataset A is {min_Mg_b2_A}")
-print(np.where(Mg_b2_B == min(Mg_b2_B))[0][0], min(Mg_b2_B))
-print(f"The wavelength of Mg_b2 in dataset B is {min_Mg_b2_B}")
-
-R=696340000
+R=696342000
+error_R = 65000
 c=299792458
+error_c = 1
 
-lambda_gem_2 = (min_Mg_b2_B + min_Mg_b2_A)/2
-delta_lambda_2 = abs(min_Mg_b2_B - lambda_gem_2)
+#gaussian results 
 
-v_2 = c* (delta_lambda_2/lambda_gem_2)
+min_A_g = avg_opt_A 
+error_A_g = pcov_n_A[2][2]**(1/2)
 
-print(lambda_gem_2, delta_lambda_2, v_2)
+min_B_g = avg_opt_B
+error_B_g = pcov_n_B[2][2]**(1/2)
 
+#polynomial result
 
-T_2 = ((2*np.pi*R)/v_2)
-print(f"{T_2} is the rotation time in seconds  calculated from Mg_b2 line")
-print(f"{T_2/(60*60*24)}is the rotation time in days  calculated from Mg_b2 line")
+# min_A_p = lambda_0_opt
+# error_A_p = pcov_p[2][2]**(1/2)
+
+t_formule = (2*np.pi*R/c)*(min_A_g +min_B_g)/(min_B_g - min_A_g)
+def omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g):
+    lambda_gem = (min_A_g+min_B_g)/2
+    delta_lambda = abs(lambda_gem - min_A_g)
+    v = c * (delta_lambda/lambda_gem)
+    T = ((2*np.pi*R)/v)
+    print(f"{T} is the rotationperiod in seconds according to Mg_b2")
+    print(f"{T/(60*60*24)} is the rotationperiod in days according to Mg_b2")
+
+    error_T = (((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2 +
+        ((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2 +
+        ((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)**(1/2)
+    print(f"{error_T} is the error on the rotationperiod in seconds according to Mg_b2")
+    print(f"{error_T/(60*60*24)} is the error on the rotationperiod in days according to Mg_b2")
+    print(((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2)
+    print(((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2)
+    print(((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)
+omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g)
 
 #%%
 Mg_b3_A_wavelength = []
 Mg_b3_A_intensity = []
+Mg_b3_A_error = []
+
 Mg_b3_B_wavelength = []
 Mg_b3_B_intensity = []
+Mg_b3_B_error = []
 
-# calculate rotztion period with Mg_b3
+# calculate rotation period with Mg-b1
 for i in range(len(wavelength_object)):
-    if 5167.0 < wavelength_object[i] < 5167.7:
+    if 5166.6 < wavelength_object[i] < 5167.8:
         Mg_b3_A_wavelength.append(wavelength_object[i])
         Mg_b3_A_intensity.append(flux_object_norm_A[i])
-        Mg_b3_B_wavelength.append(wavelength_object[i])
-        Mg_b3_B_intensity.append(flux_object_norm_B[i])
+        Mg_b3_A_error.append(flux_object_norm_A[i]/SNR_A[i])
+
+for i in range(len(wavelength_object)): 
+        if 5167.5 < wavelength_object[i] < 5167.8: # de beginwaarde klopt niet of de guess positie p0 klopt niet
+            Mg_b3_B_wavelength.append(wavelength_object[i])
+            Mg_b3_B_intensity.append(flux_object_norm_B[i])
+            Mg_b3_B_error.append(flux_object_norm_B[i]/SNR_B[i])
 
 
+def normal_distribution(x, std, avg, c):
+    return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
+
+popt_n_A, pcov_n_A = curve_fit(normal_distribution, Mg_b3_A_wavelength, Mg_b3_A_intensity, p0=[1, 5167.4, 1], sigma=Mg_b3_A_error)
+std_opt_A , avg_opt_A, c_opt_A= popt_n_A
+error_std_cov_A, error_avg_cov_A, error_c_cov_A = pcov_n_A
+print(f'minimum gaussische functie {avg_opt_A}')
+print(f'sqrt variantie en sigma std{(pcov_n_A[0][0]**(1/2)), std_opt_A}')
+
+popt_n_B, pcov_n_B = curve_fit(normal_distribution, Mg_b3_B_wavelength, Mg_b3_B_intensity, p0=[1, 5167, 1], sigma=Mg_b3_B_error)
+std_opt_B , avg_opt_B, c_opt_B= popt_n_B
+error_std_cov_B, error_avg_cov_B, error_c_cov_B = pcov_n_B
+print(f'minimum gaussische functie {avg_opt_B}')
+print(f'sqrt variantie en sigma std{(pcov_n_B[0][0]**(1/2)), std_opt_B}')
+
+"""
 fit_Mg_b3_A= np.polynomial.polynomial.polyfit(Mg_b3_A_wavelength,Mg_b3_A_intensity, 5)
 Mg_b3_A = []
 for x in Mg_b3_A_wavelength:
@@ -451,56 +551,78 @@ for x in Mg_b3_B_wavelength:
         y += (fit_Mg_b3_B[n] * (x)**n)
     # Save coordinates
     Mg_b3_B.append(y) 
+"""
+#Mg_b3
+plt.subplots(figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
+plt.plot(Mg_b3_A_wavelength, (normal_distribution(Mg_b3_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
+plt.plot(Mg_b3_B_wavelength, (normal_distribution(Mg_b3_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
 
-#Na-D2
+# plt.plot(Mg_b3_A_wavelength, (second_orde_poly(Mg_b3_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
+plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+plt.ylim(0,)
+plt.xlabel('Wavelength (Angstrom)')
+plt.ylabel("Normalized intensity")
+plt.legend(loc=2, prop={'size': 6})
+plt.show()
+
+#####
+"""
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
-plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Mg_b3 A')
-plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Mg_b3 B')
+plt.plot(wavelength_object,(flux_object_A-dark_A)/(tungstenflat_A-darkflat_A), label = 'absorption Mg-b1 A')
+plt.plot(wavelength_object,(flux_object_B-dark_B)/(tungstenflat_B-darkflat_B), label = 'absorption Mg-b1 B')
 plt.legend()
 plt.show()
 
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'green')
 plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'lime')
-plt.plot(Mg_b3_A_wavelength, Mg_b3_A, label='fitfunction A', linewidth=1, color = 'crimson')
-plt.plot(Mg_b3_B_wavelength, Mg_b3_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
+# plt.plot(Mg_b3_A_wavelength, Mg_b3_A, label='fitfunction A', linewidth=1, color = 'crimson')
+# plt.plot(Mg_b3_B_wavelength, Mg_b3_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
 plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
 plt.xlabel('Wavelength (Angstrom)')
 plt.ylabel("Normalized intensity")
 plt.legend()
 plt.show()
+"""
 
-
-min_Mg_b3_A=Mg_b3_A_wavelength[np.where(Mg_b3_A == min(Mg_b3_A))[0][0]]
-min_Mg_b3_B=Mg_b3_B_wavelength[np.where(Mg_b3_B == min(Mg_b3_B))[0][0]]
-print(np.where(Mg_b3_A == min(Mg_b3_A))[0][0], min(Mg_b3_A))
-print(f"The wavelegth of Mg_b3  in dataset A is {min_Mg_b3_A}")
-print(np.where(Mg_b3_B == min(Mg_b3_B))[0][0], min(Mg_b3_B))
-print(f"The wavelength of Mg_b3 in dataset B is {min_Mg_b3_B}")
-
-R=696340000
+R=696342000
+error_R = 65000
 c=299792458
+error_c = 1
 
-lambda_gem_3 = (min_Mg_b3_B + min_Mg_b3_A)/2
-delta_lambda_3 = abs(min_Mg_b3_B - lambda_gem_3)
+#gaussian results 
 
-v_3 = c* (delta_lambda_2/lambda_gem_2)
+min_A_g = avg_opt_A 
+error_A_g = pcov_n_A[2][2]**(1/2)
 
-print(lambda_gem_2, delta_lambda_2, v_3)
+min_B_g = avg_opt_B
+error_B_g = pcov_n_B[2][2]**(1/2)
 
+#polynomial result
 
-T_3 = ((2*np.pi*R)/v_3)
-print(f"{T_3} is the rotation time in seconds  calculated from Mg_b3 line")
-print(f"{T_3/(60*60*24)}is the rotation time in days  calculated from Mg_b3 line")
+# min_A_p = lambda_0_opt
+# error_A_p = pcov_p[2][2]**(1/2)
 
+t_formule = (2*np.pi*R/c)*(min_A_g +min_B_g)/(min_B_g - min_A_g)
+def omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g):
+    lambda_gem = (min_A_g+min_B_g)/2
+    delta_lambda = abs(lambda_gem - min_A_g)
+    v = c * (delta_lambda/lambda_gem)
+    T = ((2*np.pi*R)/v)
+    print(f"{T} is the rotationperiod in seconds according to Mg_b3")
+    print(f"{T/(60*60*24)} is the rotationperiod in days according to Mg_b3")
 
-
-
-
-
-
-
-
-
+    error_T = (((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2 +
+        ((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2 +
+        ((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)**(1/2)
+    print(f"{error_T} is the error on the rotationperiod in seconds according to Mg_b3")
+    print(f"{error_T/(60*60*24)} is the error on the rotationperiod in days according to Mg_b3")
+    print(((2*np.pi*error_R/c)*((min_A_g+min_B_g)/(min_B_g-min_A_g)))**2)
+    print(((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2)
+    print(((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)
+omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g)
 

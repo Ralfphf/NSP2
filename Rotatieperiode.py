@@ -1,13 +1,19 @@
 from Load_eshel_sun_data_orde_3 import orde_3
 from Load_eshel_sun_data_orde_7 import orde_7
+from Load_eshel_sun_data_orde_13 import orde_13
+from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 model_H_alpha = orde_3()
 model_Na = orde_7()
+model_Mg = orde_13()
 
 avg_opt_A, pcov_n_A, avg_opt_B, pcov_n_B = model_H_alpha.returns_H_alpha()
 avg_opt_D1_A, pcov_D1_A, avg_opt_D1_B, pcov_D1_B = model_Na.returns_D1()
 avg_opt_D2_A, pcov_D2_A, avg_opt_D2_B, pcov_D2_B = model_Na.returns_D2()
+avg_opt_b1_A, pcov_b1_A, avg_opt_b1_B, pcov_b1_B = model_Mg.returns_b1()
+avg_opt_b2_A, pcov_b2_A, avg_opt_b2_B, pcov_b2_B = model_Mg.returns_b2()
+avg_opt_b3_A, pcov_b3_A, avg_opt_b3_B, pcov_b3_B = model_Mg.returns_b3()
 
 
 R=696342000
@@ -30,14 +36,30 @@ def omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g):
 T_H_alpha, T_error_H_alpha = omlooptijd(avg_opt_A, pcov_n_A, avg_opt_B, pcov_n_B)
 T_Na_D1, T_error_Na_D1 = omlooptijd(avg_opt_D1_A, pcov_D1_A, avg_opt_D1_B, pcov_D1_B)
 T_Na_D2, T_error_Na_D2 = omlooptijd(avg_opt_D2_A, pcov_D2_A, avg_opt_D2_B, pcov_D2_B)
+T_Mg_b1, T_error_Mg_b1 = omlooptijd(avg_opt_b1_A, pcov_b1_A, avg_opt_b1_B, pcov_b1_B)
+T_Mg_b2, T_error_Mg_b2 = omlooptijd(avg_opt_b2_A, pcov_b2_A, avg_opt_b2_B, pcov_b2_B)
+T_Mg_b3, T_error_Mg_b3 = omlooptijd(avg_opt_b3_A, pcov_b3_A, avg_opt_b3_B, pcov_b3_B)
 
-
-all_periods = [T_H_alpha, T_Na_D1, T_Na_D2]
-all_periods_name = ['H-alpha', 'Natrium D1', 'Natrium D2']
-all_errors_periods = [T_error_H_alpha, T_error_Na_D1, T_error_Na_D2]
-number_of_lines = [1, 2, 3]
+all_periods = [T_H_alpha, T_Na_D1, T_Na_D2, T_Mg_b1, T_Mg_b2, T_Mg_b3]
+all_periods_name = ['H-alpha', 'Natrium D1', 'Natrium D2', 'Magnesium b1', 'Magnesium b2', 'Magnesium b3']
+all_errors_periods = [T_error_H_alpha, T_error_Na_D1, T_error_Na_D2, T_error_Mg_b1, T_error_Mg_b2, T_error_Mg_b3]
+number_of_lines = [1, 2, 3, 4, 5, 6]
 
     
+line_list = []
+error_line = []
+def straight_line(x, p):
+    return p 
+
+
+popt_s, pcov_s = curve_fit(straight_line, number_of_lines, all_periods, p0=[25], sigma=all_errors_periods)
+print(popt_s[0], pcov_s)
+for i in range(len(number_of_lines)):
+    line_list.append(popt_s[0])
+    error_line.append(pcov_s[0][0])
+
+
+
 fit_order_norm = 2
 fit = np.polynomial.polynomial.polyfit(number_of_lines, all_periods, fit_order_norm, w=all_errors_periods)
 
@@ -56,5 +78,9 @@ plt.ylabel("Omlooptijd (dagen)")
 plt.errorbar(all_periods_name, all_periods, yerr=all_errors_periods, fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 plt.scatter(all_periods_name, all_periods, c='blue')
 plt.plot(all_periods_name, omlooptijd_fit)
+plt.errorbar(all_periods_name, line_list, yerr=error_line, fmt='-')
+plt.ylabel('Omlooptijd equator (dagen)')
 plt.legend()
 plt.show()
+
+print(f"De gemiddelde omlooptijd is {popt_s[0]} dagen met een error van {pcov_s[0][0]}")

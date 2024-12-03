@@ -319,14 +319,14 @@ class orde_13():
         '''
 
         #plot Mg b1
-        plt.plot(self.Mg_b1_A_wavelength, (self.normal_distribution(self.Mg_b1_A_wavelength, self.popt_b1_A[0], self.popt_b1_A[1], self.popt_b1_A[2])), label='Gaussische fitfunctie A')
-        plt.plot(self.Mg_b1_B_wavelength, (self.normal_distribution(self.Mg_b1_B_wavelength, self.popt_b1_B[0], self.popt_b1_B[1], self.popt_b1_B[2])), label='Gaussische fitfunctie B')
+        plt.plot(self.Mg_b1_A_wavelength, (self.normal_distribution(self.Mg_b1_A_wavelength, self.popt_b1_A[0], self.popt_b1_A[1], self.popt_b1_A[2])), label='Gaussische fitfunctie A mg b1')
+        plt.plot(self.Mg_b1_B_wavelength, (self.normal_distribution(self.Mg_b1_B_wavelength, self.popt_b1_B[0], self.popt_b1_B[1], self.popt_b1_B[2])), label='Gaussische fitfunctie B mg b1')
         #plot Mg b2
-        plt.plot(self.Mg_b2_A_wavelength, (self.normal_distribution(self.Mg_b2_A_wavelength, self.popt_b2_A[0], self.popt_b2_A[1], self.popt_b2_A[2])), label='Gaussische fitfunctie A')
-        plt.plot(self.Mg_b2_B_wavelength, (self.normal_distribution(self.Mg_b2_B_wavelength, self.popt_b2_B[0], self.popt_b2_B[1], self.popt_b2_B[2])), label='Gaussische fitfunctie B')
+        plt.plot(self.Mg_b2_A_wavelength, (self.normal_distribution(self.Mg_b2_A_wavelength, self.popt_b2_A[0], self.popt_b2_A[1], self.popt_b2_A[2])), label='Gaussische fitfunctie A mg b2')
+        plt.plot(self.Mg_b2_B_wavelength, (self.normal_distribution(self.Mg_b2_B_wavelength, self.popt_b2_B[0], self.popt_b2_B[1], self.popt_b2_B[2])), label='Gaussische fitfunctie B mg b2')
         #plot Mg b3
-        plt.plot(self.Mg_b3_A_wavelength, (self.normal_distribution(self.Mg_b3_A_wavelength, self.popt_b3_A[0], self.popt_b3_A[1], self.popt_b3_A[2])), label='Gaussische fitfunctie A')
-        plt.plot(self.Mg_b3_B_wavelength, (self.normal_distribution(self.Mg_b3_B_wavelength, self.popt_b3_B[0], self.popt_b3_B[1], self.popt_b3_B[2])), label='Gaussische fitfunctie B')
+        plt.plot(self.Mg_b3_A_wavelength, (self.normal_distribution(self.Mg_b3_A_wavelength, self.popt_b3_A[0], self.popt_b3_A[1], self.popt_b3_A[2])), label='Gaussische fitfunctie A mg b3')
+        plt.plot(self.Mg_b3_B_wavelength, (self.normal_distribution(self.Mg_b3_B_wavelength, self.popt_b3_B[0], self.popt_b3_B[1], self.popt_b3_B[2])), label='Gaussische fitfunctie B mg b3')
 
 
         plt.errorbar(self.wavelength_object, self.flux_object_norm_A, yerr=self.flux_object_norm_A/self.SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)

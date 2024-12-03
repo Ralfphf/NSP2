@@ -41,7 +41,7 @@ T_Mg_b2, T_error_Mg_b2 = omlooptijd(avg_opt_b2_A, pcov_b2_A, avg_opt_b2_B, pcov_
 T_Mg_b3, T_error_Mg_b3 = omlooptijd(avg_opt_b3_A, pcov_b3_A, avg_opt_b3_B, pcov_b3_B)
 
 all_periods = [T_H_alpha, T_Na_D1, T_Na_D2, T_Mg_b1, T_Mg_b2, T_Mg_b3]
-all_periods_name = ['H-alpha', 'Natrium D1', 'Natrium D2', 'Magnesium b1', 'Magnesium b2', 'Magnesium b3']
+all_periods_name = ['H-alpha', 'Na D1', 'Na D2', 'Mg b1', 'Mg b2', 'Mg b3']
 all_errors_periods = [T_error_H_alpha, T_error_Na_D1, T_error_Na_D2, T_error_Mg_b1, T_error_Mg_b2, T_error_Mg_b3]
 number_of_lines = [1, 2, 3, 4, 5, 6]
 
@@ -77,8 +77,8 @@ for x in number_of_lines:
 plt.ylabel("Omlooptijd (dagen)")
 plt.errorbar(all_periods_name, all_periods, yerr=all_errors_periods, fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
 plt.scatter(all_periods_name, all_periods, c='blue')
-plt.plot(all_periods_name, omlooptijd_fit)
-plt.errorbar(all_periods_name, line_list, yerr=error_line, fmt='-')
+# plt.plot(all_periods_name, omlooptijd_fit)
+plt.errorbar(all_periods_name, line_list, yerr=error_line, fmt='-', label='Gemiddelde omlooptijd')
 plt.ylabel('Omlooptijd equator (dagen)')
 plt.legend()
 plt.show()

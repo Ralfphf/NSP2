@@ -504,13 +504,13 @@ Mg_b3_B_error = []
 
 # calculate rotation period with Mg-b1
 for i in range(len(wavelength_object)):
-    if 5166.6 < wavelength_object[i] < 5167.8:
+    if 5166.70 < wavelength_object[i] < 5168.00:
         Mg_b3_A_wavelength.append(wavelength_object[i])
         Mg_b3_A_intensity.append(flux_object_norm_A[i])
         Mg_b3_A_error.append(flux_object_norm_A[i]/SNR_A[i])
 
 for i in range(len(wavelength_object)): 
-        if 5167.5 < wavelength_object[i] < 5167.8: # de beginwaarde klopt niet of de guess positie p0 klopt niet
+        if 5166.8 < wavelength_object[i] < 5168.01: # de beginwaarde klopt niet of de guess positie p0 klopt niet
             Mg_b3_B_wavelength.append(wavelength_object[i])
             Mg_b3_B_intensity.append(flux_object_norm_B[i])
             Mg_b3_B_error.append(flux_object_norm_B[i]/SNR_B[i])
@@ -553,20 +553,7 @@ for x in Mg_b3_B_wavelength:
     Mg_b3_B.append(y) 
 """
 #Mg_b3
-plt.subplots(figsize=(16.5, 11.7), dpi=300)
-plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
-plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(Mg_b3_A_wavelength, (normal_distribution(Mg_b3_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
-plt.plot(Mg_b3_B_wavelength, (normal_distribution(Mg_b3_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
 
-# plt.plot(Mg_b3_A_wavelength, (second_orde_poly(Mg_b3_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
-plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
-plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
-plt.ylim(0,)
-plt.xlabel('Wavelength (Angstrom)')
-plt.ylabel("Normalized intensity")
-plt.legend(loc=2, prop={'size': 6})
-plt.show()
 
 #####
 """
@@ -626,3 +613,23 @@ def omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g):
     print(((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)
 omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g)
 
+#%%
+plt.subplots(figsize=(16.5, 11.7), dpi=300)
+plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
+plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
+
+plt.plot(Mg_b2_A_wavelength, (normal_distribution(Mg_b2_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
+plt.plot(Mg_b2_B_wavelength, (normal_distribution(Mg_b2_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
+plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+
+plt.plot(Mg_b3_A_wavelength, (normal_distribution(Mg_b3_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
+plt.plot(Mg_b3_B_wavelength, (normal_distribution(Mg_b3_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
+plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
+
+plt.ylim(0,)
+plt.xlabel('Wavelength (Angstrom)')
+plt.ylabel("Normalized intensity")
+plt.legend(loc=2, prop={'size': 6})
+plt.show()

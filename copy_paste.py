@@ -1,69 +1,69 @@
-Mg_b3_A_wavelength = []
-Mg_b3_A_intensity = []
-Mg_b3_A_error = []
+Na_D2_A_wavelength = []
+Na_D2_A_intensity = []
+Na_D2_A_error = []
 
-Mg_b3_B_wavelength = []
-Mg_b3_B_intensity = []
-Mg_b3_B_error = []
+Na_D2_B_wavelength = []
+Na_D2_B_intensity = []
+Na_D2_B_error = []
 
 # calculate rotation period with Mg-b1
 for i in range(len(wavelength_object)):
     if 5183.1 < wavelength_object[i] < 5184.0:
-        Mg_b3_A_wavelength.append(wavelength_object[i])
-        Mg_b3_A_intensity.append(flux_object_norm_A[i])
-        Mg_b3_A_error.append(flux_object_norm_A[i]/SNR_A[i])
+        Na_D2_A_wavelength.append(wavelength_object[i])
+        Na_D2_A_intensity.append(flux_object_norm_A[i])
+        Na_D2_A_error.append(flux_object_norm_A[i]/SNR_A[i])
 
 for i in range(len(wavelength_object)):
         if 5183.3 < wavelength_object[i] < 5184.0:
-            Mg_b3_B_wavelength.append(wavelength_object[i])
-            Mg_b3_B_intensity.append(flux_object_norm_B[i])
-            Mg_b3_B_error.append(flux_object_norm_B[i]/SNR_B[i])
+            Na_D2_B_wavelength.append(wavelength_object[i])
+            Na_D2_B_intensity.append(flux_object_norm_B[i])
+            Na_D2_B_error.append(flux_object_norm_B[i]/SNR_B[i])
 
 
 def normal_distribution(x, std, avg, c):
     return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
 
-popt_n_A, pcov_n_A = curve_fit(normal_distribution, Mg_b3_A_wavelength, Mg_b3_A_intensity, p0=[1, 5183, 1], sigma=Mg_b3_A_error)
+popt_n_A, pcov_n_A = curve_fit(normal_distribution, Na_D2_A_wavelength, Na_D2_A_intensity, p0=[1, 5183, 1], sigma=Na_D2_A_error)
 std_opt_A , avg_opt_A, c_opt_A= popt_n_A
 error_std_cov_A, error_avg_cov_A, error_c_cov_A = pcov_n_A
 print(f'minimum gaussische functie {avg_opt_A}')
 print(f'sqrt variantie en sigma std{(pcov_n_A[0][0]**(1/2)), std_opt_A}')
 
-popt_n_B, pcov_n_B = curve_fit(normal_distribution, Mg_b3_B_wavelength, Mg_b3_B_intensity, p0=[1, 5183, 1], sigma=Mg_b3_B_error)
+popt_n_B, pcov_n_B = curve_fit(normal_distribution, Na_D2_B_wavelength, Na_D2_B_intensity, p0=[1, 5183, 1], sigma=Na_D2_B_error)
 std_opt_B , avg_opt_B, c_opt_B= popt_n_B
 error_std_cov_B, error_avg_cov_B, error_c_cov_B = pcov_n_B
 print(f'minimum gaussische functie {avg_opt_B}')
 print(f'sqrt variantie en sigma std{(pcov_n_B[0][0]**(1/2)), std_opt_B}')
 
 """
-fit_Mg_b3_A= np.polynomial.polynomial.polyfit(Mg_b3_A_wavelength,Mg_b3_A_intensity, 5)
-Mg_b3_A = []
-for x in Mg_b3_A_wavelength:
+fit_Na_D2_A= np.polynomial.polynomial.polyfit(Na_D2_A_wavelength,Na_D2_A_intensity, 5)
+Na_D2_A = []
+for x in Na_D2_A_wavelength:
     y = 0
     # Calculate y_coordinate
-    for n in range(len(fit_Mg_b3_A)):
-        y += (fit_Mg_b3_A[n] * (x)**n)
+    for n in range(len(fit_Na_D2_A)):
+        y += (fit_Na_D2_A[n] * (x)**n)
     # Save coordinates
-    Mg_b3_A.append(y) 
+    Na_D2_A.append(y) 
 
-fit_Mg_b3_B =  np.polynomial.polynomial.polyfit(Mg_b3_B_wavelength,Mg_b3_B_intensity, 5)
-Mg_b3_B = []
-for x in Mg_b3_B_wavelength:
+fit_Na_D2_B =  np.polynomial.polynomial.polyfit(Na_D2_B_wavelength,Na_D2_B_intensity, 5)
+Na_D2_B = []
+for x in Na_D2_B_wavelength:
     y = 0
     # Calculate y_coordinate
-    for n in range(len(fit_Mg_b3_B)):
-        y += (fit_Mg_b3_B[n] * (x)**n)
+    for n in range(len(fit_Na_D2_B)):
+        y += (fit_Na_D2_B[n] * (x)**n)
     # Save coordinates
-    Mg_b3_B.append(y) 
+    Na_D2_B.append(y) 
 """
-#Mg_b3
+#Na_D2
 plt.subplots(figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
 plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(Mg_b3_A_wavelength, (normal_distribution(Mg_b3_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
-plt.plot(Mg_b3_B_wavelength, (normal_distribution(Mg_b3_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
+plt.plot(Na_D2_A_wavelength, (normal_distribution(Na_D2_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
+plt.plot(Na_D2_B_wavelength, (normal_distribution(Na_D2_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
 
-# plt.plot(Mg_b3_A_wavelength, (second_orde_poly(Mg_b3_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
+# plt.plot(Na_D2_A_wavelength, (second_orde_poly(Na_D2_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
 plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
 plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
 plt.ylim(0,)
@@ -83,8 +83,8 @@ plt.show()
 plt.subplots(1, 1, figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A", color = 'green')
 plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B", color = 'lime')
-# plt.plot(Mg_b3_A_wavelength, Mg_b3_A, label='fitfunction A', linewidth=1, color = 'crimson')
-# plt.plot(Mg_b3_B_wavelength, Mg_b3_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
+# plt.plot(Na_D2_A_wavelength, Na_D2_A, label='fitfunction A', linewidth=1, color = 'crimson')
+# plt.plot(Na_D2_B_wavelength, Na_D2_B, label='fitfunction B', linewidth=1, color = 'fuchsia')
 plt.plot(wavelength_object, flux_object_norm_B)
 plt.ylim(0,)
 plt.xlabel('Wavelength (Angstrom)')
@@ -401,37 +401,37 @@ for x in wavelength_object:
 flux_object_norm_A = (flux_object_A-dark_A)/((tungstenflat_A-darkflat_A)*normalisation_fit_A)
 flux_object_norm_B = (flux_object_B-dark_B)/((tungstenflat_B-darkflat_B)*normalisation_fit_B)
 
-Mg_b3_A_wavelength = []
-Mg_b3_A_intensity = []
-Mg_b3_B_wavelength = []
-Mg_b3_B_intensity = []
-Mg_b3_A_error = []
-Mg_b3_B_error = []
+Na_D2_A_wavelength = []
+Na_D2_A_intensity = []
+Na_D2_B_wavelength = []
+Na_D2_B_intensity = []
+Na_D2_A_error = []
+Na_D2_B_error = []
 
 for i in range(len(wavelength_object)):
     if 6561.83 < wavelength_object[i] < 6563.63:
-        Mg_b3_A_wavelength.append(wavelength_object[i])
-        Mg_b3_A_intensity.append(flux_object_norm_A[i])
-        Mg_b3_A_error.append(flux_object_norm_A[i]/SNR_A[i])
+        Na_D2_A_wavelength.append(wavelength_object[i])
+        Na_D2_A_intensity.append(flux_object_norm_A[i])
+        Na_D2_A_error.append(flux_object_norm_A[i]/SNR_A[i])
 
 for i in range(len(wavelength_object)):
     if 6561.89 < wavelength_object[i] < 6563.68:
-        Mg_b3_B_wavelength.append(wavelength_object[i])
-        Mg_b3_B_intensity.append(flux_object_norm_B[i])
-        Mg_b3_B_error.append(flux_object_norm_B[i]/SNR_B[i])
+        Na_D2_B_wavelength.append(wavelength_object[i])
+        Na_D2_B_intensity.append(flux_object_norm_B[i])
+        Na_D2_B_error.append(flux_object_norm_B[i]/SNR_B[i])
 
 
 
 def normal_distribution(x, std, avg, c):
     return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
 
-popt_n_A, pcov_n_A = curve_fit(normal_distribution, Mg_b3_A_wavelength, Mg_b3_A_intensity, p0=[1, 6562.7, 1], sigma=Mg_b3_A_error)
+popt_n_A, pcov_n_A = curve_fit(normal_distribution, Na_D2_A_wavelength, Na_D2_A_intensity, p0=[1, 6562.7, 1], sigma=Na_D2_A_error)
 std_opt_A , avg_opt_A, c_opt_A= popt_n_A
 error_std_cov_A, error_avg_cov_A, error_c_cov_A = pcov_n_A
 print(f'minimum gaussische functie {avg_opt_A}')
 print(f'sqrt variantie en sigma std{(pcov_n_A[0][0]**(1/2)), std_opt_A}')
 
-popt_n_B, pcov_n_B = curve_fit(normal_distribution, Mg_b3_B_wavelength, Mg_b3_B_intensity, p0=[1, 6562.7, 1], sigma=Mg_b3_B_error)
+popt_n_B, pcov_n_B = curve_fit(normal_distribution, Na_D2_B_wavelength, Na_D2_B_intensity, p0=[1, 6562.7, 1], sigma=Na_D2_B_error)
 std_opt_B , avg_opt_B, c_opt_B = popt_n_B
 error_std_cov_B, error_avg_cov_B, error_c_cov_B = pcov_n_B
 print(f'minimum gaussische functie {avg_opt_B}')
@@ -441,7 +441,7 @@ print(f'sqrt variantie en sigma std{(pcov_n_B[0][0]**(1/2)), std_opt_B}')
 # def second_orde_poly(x, a, b, lambda_0):
 #     return a*(x-lambda_0)**2 + b
 
-# popt_p, pcov_p = curve_fit(second_orde_poly, Mg_b3_A_wavelength, Mg_b3_A_intensity, p0=[1, 2, 6562.7], sigma=Mg_b3_A_error)
+# popt_p, pcov_p = curve_fit(second_orde_poly, Na_D2_A_wavelength, Na_D2_A_intensity, p0=[1, 2, 6562.7], sigma=Na_D2_A_error)
 # a_opt, b_opt, lambda_0_opt = popt_p
 # print(f'minimum polynoom functie {lambda_0_opt}')
 # print(f'sqrt variantie lambda 0 {(pcov_p[2][2]**(1/2))}')
@@ -452,10 +452,10 @@ print(f'sqrt variantie en sigma std{(pcov_n_B[0][0]**(1/2)), std_opt_B}')
 plt.subplots(figsize=(16.5, 11.7), dpi=300)
 plt.plot(wavelength_object, flux_object_norm_A, linewidth=1, label="Dataset A")
 plt.plot(wavelength_object, flux_object_norm_B, linewidth=1, label="Dataset B")
-plt.plot(Mg_b3_A_wavelength, (normal_distribution(Mg_b3_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
-plt.plot(Mg_b3_B_wavelength, (normal_distribution(Mg_b3_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
+plt.plot(Na_D2_A_wavelength, (normal_distribution(Na_D2_A_wavelength, std_opt_A, avg_opt_A, c_opt_A)), label='Gaussische fitfunctie A')
+plt.plot(Na_D2_B_wavelength, (normal_distribution(Na_D2_B_wavelength, std_opt_B, avg_opt_B, c_opt_B)), label='Gaussische fitfunctie B')
 
-# plt.plot(Mg_b3_A_wavelength, (second_orde_poly(Mg_b3_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
+# plt.plot(Na_D2_A_wavelength, (second_orde_poly(Na_D2_A_wavelength, a_opt, b_opt, lambda_0_opt)), label='Tweede orde polynoom fitfunctie')
 plt.errorbar(wavelength_object, flux_object_norm_A, yerr=flux_object_norm_A/SNR_A, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
 plt.errorbar(wavelength_object, flux_object_norm_B, yerr=flux_object_norm_B/SNR_B, markersize='1', fmt='.', ecolor='red', elinewidth=0.5)
 plt.ylim(0,)

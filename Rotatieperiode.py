@@ -9,11 +9,24 @@ model_Na = orde_7()
 model_Mg = orde_13()
 
 avg_opt_A, pcov_n_A, avg_opt_B, pcov_n_B = model_H_alpha.returns_H_alpha()
+avg_opt_A_C, pcov_n_A_C, avg_opt_B_C, pcov_n_B_C = model_H_alpha.returns_Ca_1()
+avg_opt_A_T, pcov_n_A_T, avg_opt_B_T, pcov_n_B_T = model_H_alpha.returns_Ti_1()
 avg_opt_D1_A, pcov_D1_A, avg_opt_D1_B, pcov_D1_B = model_Na.returns_D1()
 avg_opt_D2_A, pcov_D2_A, avg_opt_D2_B, pcov_D2_B = model_Na.returns_D2()
 avg_opt_b1_A, pcov_b1_A, avg_opt_b1_B, pcov_b1_B = model_Mg.returns_b1()
 avg_opt_b2_A, pcov_b2_A, avg_opt_b2_B, pcov_b2_B = model_Mg.returns_b2()
 avg_opt_b3_A, pcov_b3_A, avg_opt_b3_B, pcov_b3_B = model_Mg.returns_b3()
+
+def errors(avg_opt_A, pcov_n_A, avg_opt_B, pcov_n_B):
+    if avg_opt_A < avg_opt_B:
+        _,_,v=omlooptijd(avg_opt_A, pcov_n_A, avg_opt_B, pcov_n_B)
+        v_error = (((avg_opt_B+pcov_n_B)/(((avg_opt_B-pcov_n_B)+(avg_opt_A-pcov_n_A))/2))-1)*c -v
+        T = ((2*np.pi*R)/v)/(60*60*24)
+        error_T_high = ((2*np.pi*R)/(v+v_error))/(60*60*24) - T
+        error_T_low = -(((2*np.pi*R)/(v-v_error))/(60*60*24) - T)
+        return error_T_high, error_T_low
+    
+
 
 
 R=696342000
@@ -31,19 +44,21 @@ def omlooptijd(min_A_g, error_A_g, min_B_g, error_B_g):
         ((2*np.pi*R/c)*((2*min_B_g*error_A_g)/((min_A_g-min_B_g)**2)))**2 +
         ((2*np.pi*R/c)*((2*min_A_g*error_B_g)/((min_B_g-min_A_g)**2)))**2)**(1/2))/(60*60*24)
     print(f"{error_T} is de error van de omlooptijd in dagen")
-    return T, error_T
+    return T, error_T, v
 
-T_H_alpha, T_error_H_alpha = omlooptijd(avg_opt_A, pcov_n_A, avg_opt_B, pcov_n_B)
-T_Na_D1, T_error_Na_D1 = omlooptijd(avg_opt_D1_A, pcov_D1_A, avg_opt_D1_B, pcov_D1_B)
-T_Na_D2, T_error_Na_D2 = omlooptijd(avg_opt_D2_A, pcov_D2_A, avg_opt_D2_B, pcov_D2_B)
-T_Mg_b1, T_error_Mg_b1 = omlooptijd(avg_opt_b1_A, pcov_b1_A, avg_opt_b1_B, pcov_b1_B)
-T_Mg_b2, T_error_Mg_b2 = omlooptijd(avg_opt_b2_A, pcov_b2_A, avg_opt_b2_B, pcov_b2_B)
-T_Mg_b3, T_error_Mg_b3 = omlooptijd(avg_opt_b3_A, pcov_b3_A, avg_opt_b3_B, pcov_b3_B)
+T_H_alpha, T_error_H_alpha,_ = omlooptijd(avg_opt_A, pcov_n_A, avg_opt_B, pcov_n_B)
+T_Ca_1,T_error_Ca_1,_ = omlooptijd(avg_opt_A_C, pcov_n_A_C,avg_opt_B_C, pcov_n_B_C)
+T_Ti_1, T_error_Ti_1,_ = omlooptijd(avg_opt_A_T, pcov_n_A_T,avg_opt_B_T, pcov_n_B_T)
+T_Na_D1, T_error_Na_D1,_ = omlooptijd(avg_opt_D1_A, pcov_D1_A, avg_opt_D1_B, pcov_D1_B)
+T_Na_D2, T_error_Na_D2,_ = omlooptijd(avg_opt_D2_A, pcov_D2_A, avg_opt_D2_B, pcov_D2_B)
+T_Mg_b1, T_error_Mg_b1,_ = omlooptijd(avg_opt_b1_A, pcov_b1_A, avg_opt_b1_B, pcov_b1_B)
+T_Mg_b2, T_error_Mg_b2,_ = omlooptijd(avg_opt_b2_A, pcov_b2_A, avg_opt_b2_B, pcov_b2_B)
+T_Mg_b3, T_error_Mg_b3,_ = omlooptijd(avg_opt_b3_A, pcov_b3_A, avg_opt_b3_B, pcov_b3_B)
 
-all_periods = [T_H_alpha, T_Na_D1, T_Na_D2, T_Mg_b1, T_Mg_b2, T_Mg_b3]
-all_periods_name = ['H-alpha (6562.81)', 'Na D1 (5895.92)', 'Na D2 (5889.95)', 'Mg b1 (5183.62)', 'Mg b2 (5172.70)', 'Mg b3 (5168.91)']
-all_errors_periods = [T_error_H_alpha, T_error_Na_D1, T_error_Na_D2, T_error_Mg_b1, T_error_Mg_b2, T_error_Mg_b3]
-number_of_lines = [1, 2, 3, 4, 5, 6]
+all_periods = [T_H_alpha, T_Ca_1, T_Ti_1, T_Na_D1, T_Na_D2, T_Mg_b1, T_Mg_b2, T_Mg_b3]
+all_periods_name = ['H-alpha (6562.81)', 'Ca_1 (6717.687)', 'Ti_1(6678.576)', 'Na D1 (5895.92)', 'Na D2 (5889.95)', 'Mg b1 (5183.62)', 'Mg b2 (5172.70)', 'Mg b3 (5168.91)']
+all_errors_periods = [T_error_H_alpha, T_error_Ca_1, T_error_Ti_1, T_error_Na_D1, T_error_Na_D2, T_error_Mg_b1, T_error_Mg_b2, T_error_Mg_b3]
+number_of_lines = [1, 2, 3, 4, 5, 6, 7, 8]
 
     
 line_list = []
@@ -58,13 +73,10 @@ for i in range(len(number_of_lines)):
     line_list.append(popt_s[0])
     error_line.append(pcov_s[0][0])
 
-
+# errors()
 
 plt.ylabel("Omlooptijd (dagen)")
 plt.errorbar(all_periods_name, all_periods, yerr=all_errors_periods, fmt='o', ecolor='red', capsize=3, label='Rotationperiods with errorbars')
-# plt.scatter(all_periods_name, all_periods, c='blue')
-# plt.plot(all_periods_name, omlooptijd_fit)
-# plt.errorbar(all_periods_name, line_list, yerr=error_line, fmt='-', label='Gemiddelde omlooptijd')
 plt.axhline(popt_s[0], color='black', linestyle='-', linewidth=1, label = 'Average rotation period')
 plt.axhline(popt_s[0]+pcov_s[0][0], color='gray', linestyle='--', linewidth=1, label = 'Error average rotation period')
 plt.axhline(popt_s[0]-pcov_s[0][0], color='gray', linestyle='--', linewidth=1)

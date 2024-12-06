@@ -164,6 +164,45 @@ class orde_3():
                 H_alpha_B_intensity.append(self.flux_object_norm_B[i])
                 H_alpha_B_error.append(self.flux_object_norm_B[i]/self.SNR_B[i])
 
+        self.Ca_1_A_wavelength = []
+        Ca_1_A_intensity = []
+        self.Ca_1_B_wavelength = []
+        Ca_1_B_intensity = []
+        Ca_1_A_error = []
+        Ca_1_B_error = []
+
+        for i in range(len(self.wavelength_object)):
+            if 6717.30 < self.wavelength_object[i] < 6718.00:
+                self.Ca_1_A_wavelength.append(self.wavelength_object[i])
+                Ca_1_A_intensity.append(self.flux_object_norm_A[i])
+                Ca_1_A_error.append(self.flux_object_norm_A[i]/self.SNR_A[i])
+
+        for i in range(len(self.wavelength_object)):
+            if 6717.50 < self.wavelength_object[i] < 6718.00:
+                self.Ca_1_B_wavelength.append(self.wavelength_object[i])
+                Ca_1_B_intensity.append(self.flux_object_norm_B[i])
+                Ca_1_B_error.append(self.flux_object_norm_B[i]/self.SNR_B[i])
+
+        self.Ti_1_A_wavelength = []
+        Ti_1_A_intensity = []
+        self.Ti_1_B_wavelength = []
+        Ti_1_B_intensity = []
+        Ti_1_A_error = []
+        Ti_1_B_error = []
+
+        for i in range(len(self.wavelength_object)):
+            if 6677.50 < self.wavelength_object[i] < 6678.55:
+                self.Ti_1_A_wavelength.append(self.wavelength_object[i])
+                Ti_1_A_intensity.append(self.flux_object_norm_A[i])
+                Ti_1_A_error.append(self.flux_object_norm_A[i]/self.SNR_A[i])
+
+        for i in range(len(self.wavelength_object)):
+            if 6677.40 < self.wavelength_object[i] < 6678.50:
+                self.Ti_1_B_wavelength.append(self.wavelength_object[i])
+                Ti_1_B_intensity.append(self.flux_object_norm_B[i])
+                Ti_1_B_error.append(self.flux_object_norm_B[i]/self.SNR_B[i])
+
+
         def normal_distribution(x, std, avg, c):
             return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
 
@@ -173,6 +212,17 @@ class orde_3():
         popt_n_B, self.pcov_n_B = curve_fit(normal_distribution, self.H_alpha_B_wavelength, H_alpha_B_intensity, p0=[1, 6562.7, 1], sigma=H_alpha_B_error)
         self.std_opt_B , self.avg_opt_B, self.c_opt_B= popt_n_B
 
+        popt_n_A_C, self.pcov_n_A_C = curve_fit(normal_distribution, self.Ca_1_A_wavelength, Ca_1_A_intensity, p0=[1, 6717.65, 1], sigma=Ca_1_A_error)
+        self.std_opt_A_C , self.avg_opt_A_C, self.c_opt_A_C= popt_n_A_C
+
+        popt_n_B_C, self.pcov_n_B_C = curve_fit(normal_distribution, self.Ca_1_B_wavelength, Ca_1_B_intensity, p0=[1, 6717.75, 1], sigma=Ca_1_B_error)
+        self.std_opt_B_C , self.avg_opt_B_C, self.c_opt_B_C= popt_n_B_C
+
+        popt_n_A_T, self.pcov_n_A_T = curve_fit(normal_distribution, self.Ti_1_A_wavelength, Ti_1_A_intensity, p0=[1, 6678.10, 1], sigma=Ti_1_A_error)
+        self.std_opt_A_T , self.avg_opt_A_T, self.c_opt_A_T= popt_n_A_T
+
+        popt_n_B_T, self.pcov_n_B_T = curve_fit(normal_distribution, self.Ti_1_B_wavelength, Ti_1_B_intensity, p0=[1, 6677.85, 1], sigma=Ti_1_B_error)
+        self.std_opt_B_T , self.avg_opt_B_T, self.c_opt_B_T= popt_n_B_T
         self.normal_distribution = normal_distribution
 
     def all_datasets_graph(self):
@@ -278,6 +328,12 @@ class orde_3():
 
     def returns_H_alpha(self):
         return self.avg_opt_A, self.pcov_n_A[1][1]**(1/2), self.avg_opt_B, self.pcov_n_B[1][1]**(1/2)
+    
+    def returns_Ca_1(self):
+        return self.avg_opt_A_C, self.pcov_n_A_C[1][1]**(1/2), self.avg_opt_B_C, self.pcov_n_B_C[1][1]**(1/2)
+
+    def returns_Ti_1(self):
+        return self.avg_opt_A_T, self.pcov_n_A_T[1][1]**(1/2), self.avg_opt_B_T, self.pcov_n_B_T[1][1]**(1/2)
 
 
         

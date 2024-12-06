@@ -41,7 +41,7 @@ T_Mg_b2, T_error_Mg_b2 = omlooptijd(avg_opt_b2_A, pcov_b2_A, avg_opt_b2_B, pcov_
 T_Mg_b3, T_error_Mg_b3 = omlooptijd(avg_opt_b3_A, pcov_b3_A, avg_opt_b3_B, pcov_b3_B)
 
 all_periods = [T_H_alpha, T_Na_D1, T_Na_D2, T_Mg_b1, T_Mg_b2, T_Mg_b3]
-all_periods_name = ['H-alpha', 'Na D1', 'Na D2', 'Mg b1', 'Mg b2', 'Mg b3']
+all_periods_name = ['H-alpha (6562.81)', 'Na D1 (5895.92)', 'Na D2 (5889.95)', 'Mg b1 (5183.62)', 'Mg b2 (5172.70)', 'Mg b3 (5168.91)']
 all_errors_periods = [T_error_H_alpha, T_error_Na_D1, T_error_Na_D2, T_error_Mg_b1, T_error_Mg_b2, T_error_Mg_b3]
 number_of_lines = [1, 2, 3, 4, 5, 6]
 
@@ -60,26 +60,16 @@ for i in range(len(number_of_lines)):
 
 
 
-fit_order_norm = 2
-fit = np.polynomial.polynomial.polyfit(number_of_lines, all_periods, fit_order_norm, w=all_errors_periods)
-
-# x & y coordinaten van de fit
-omlooptijd_fit= []
-for x in number_of_lines:
-    y = 0
-    # Calculate y_coordinate
-    for n in range(len(fit)):
-        y += (fit[n] * (x)**n) + 0.1
-    # Save coordinates
-    omlooptijd_fit.append(y)   
-# lekker plotten:
-
 plt.ylabel("Omlooptijd (dagen)")
-plt.errorbar(all_periods_name, all_periods, yerr=all_errors_periods, fmt='o', ecolor='red', capsize=3, label='Residuals with error bars')
-plt.scatter(all_periods_name, all_periods, c='blue')
+plt.errorbar(all_periods_name, all_periods, yerr=all_errors_periods, fmt='o', ecolor='red', capsize=3, label='Rotationperiods with errorbars')
+# plt.scatter(all_periods_name, all_periods, c='blue')
 # plt.plot(all_periods_name, omlooptijd_fit)
-plt.errorbar(all_periods_name, line_list, yerr=error_line, fmt='-', label='Gemiddelde omlooptijd')
+# plt.errorbar(all_periods_name, line_list, yerr=error_line, fmt='-', label='Gemiddelde omlooptijd')
+plt.axhline(popt_s[0], color='black', linestyle='-', linewidth=1, label = 'Average rotation period')
+plt.axhline(popt_s[0]+pcov_s[0][0], color='gray', linestyle='--', linewidth=1, label = 'Error average rotation period')
+plt.axhline(popt_s[0]-pcov_s[0][0], color='gray', linestyle='--', linewidth=1)
 plt.ylabel('Omlooptijd equator (dagen)')
+plt.xlabel('Wavelength absorptionlines (Angstrom)')
 plt.legend()
 plt.show()
 

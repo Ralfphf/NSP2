@@ -121,33 +121,33 @@ class orde_7():
 
         # %% Nu aan jullie om lekker te normaliseren:
 
-        fit_order_norm = 10
+        fit_order_norm = 50
         fit_2_A = np.polynomial.polynomial.polyfit(self.wavelength_object,(self.flux_object_A-self.dark_A)/(self.tungstenflat_A-self.darkflat_A),fit_order_norm)
 
         # x & y coordinaten van de fit
-        normalisation_fit_A= []
+        self.normalisation_fit_A= []
         for x in self.wavelength_object:
             y = 0
             # Calculate y_coordinate
             for n in range(len(fit_2_A)):
                 y += (fit_2_A[n] * (x)**n) + 0.1
             # Save coordinates
-            normalisation_fit_A.append(y)   
+            self.normalisation_fit_A.append(y)   
 
         fit_2_B = np.polynomial.polynomial.polyfit(self.wavelength_object,(self.flux_object_B-self.dark_B)/(self.tungstenflat_B-self.darkflat_B),fit_order_norm)
 
         # x & y coordinaten van de fit
-        normalisation_fit_B= []
+        self.normalisation_fit_B= []
         for x in self.wavelength_object:
             y = 0
             # Calculate y_coordinate
             for n in range(len(fit_2_B)):
                 y += (fit_2_B[n] * (x)**n) + 0.1
             # Save coordinates
-            normalisation_fit_B.append(y)   
+            self.normalisation_fit_B.append(y)   
 
-        self.flux_object_norm_A = (self.flux_object_A-self.dark_A)/((self.tungstenflat_A-self.darkflat_A)*normalisation_fit_A)
-        self.flux_object_norm_B = (self.flux_object_B-self.dark_B)/((self.tungstenflat_B-self.darkflat_B)*normalisation_fit_B)
+        self.flux_object_norm_A = (self.flux_object_A-self.dark_A)/((self.tungstenflat_A-self.darkflat_A)*self.normalisation_fit_A)
+        self.flux_object_norm_B = (self.flux_object_B-self.dark_B)/((self.tungstenflat_B-self.darkflat_B)*self.normalisation_fit_B)
 
 
         #Natrium lijn D1 fitfunctie
@@ -278,10 +278,12 @@ class orde_7():
         # %% first order flux correction:
     def flux_graph(self):        
         plt.plot(self.wavelength_object, (self.flux_object_A - self.dark_A)/(self.tungstenflat_A-self.darkflat_A))
+        plt.plot(self.wavelength_object, self.normalisation_fit_A)
         plt.ylim(0,)
         plt.show()
 
         plt.plot(self.wavelength_object,(self.flux_object_B-self.dark_B)/(self.tungstenflat_B-self.darkflat_B))
+        plt.plot(self.wavelength_object, self.normalisation_fit_B)
         plt.ylim(0,)
         plt.show()
 
@@ -308,12 +310,8 @@ class orde_7():
     def returns_D2(self):
         return self.avg_opt_D2_A, self.pcov_D2_A[1][1]**(1/2), self.avg_opt_D2_B, self.pcov_D2_B[1][1]**(1/2)
 
-# %%
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    model = orde_7()
+    model.residuals_graph()
+    model.flux_graph()
+    model.fitted_spectrallines()

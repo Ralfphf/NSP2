@@ -122,29 +122,29 @@ class orde_13():
         fit_2_A = np.polynomial.polynomial.polyfit(self.wavelength_object,(self.flux_object_A-self.dark_A)/(self.tungstenflat_A-self.darkflat_A),fit_order_norm)
 
         # x & y coordinaten van de fit
-        normalisation_fit_A= []
+        self.normalisation_fit_A= []
         for x in self.wavelength_object:
             y = 0
             # Calculate y_coordinate
             for n in range(len(fit_2_A)):
-                y += (fit_2_A[n] * (x)**n) + 0.1
+                y += (fit_2_A[n] * (x)**n) + 0.005
             # Save coordinates
-            normalisation_fit_A.append(y)   
+            self.normalisation_fit_A.append(y)   
 
         fit_2_B = np.polynomial.polynomial.polyfit(self.wavelength_object,(self.flux_object_B-self.dark_B)/(self.tungstenflat_B-self.darkflat_B),fit_order_norm)
 
         # x & y coordinaten van de fit
-        normalisation_fit_B= []
+        self.normalisation_fit_B= []
         for x in self.wavelength_object:
             y = 0
             # Calculate y_coordinate
             for n in range(len(fit_2_B)):
-                y += (fit_2_B[n] * (x)**n) + 0.1
+                y += (fit_2_B[n] * (x)**n) + 0.007
             # Save coordinates
-            normalisation_fit_B.append(y)   
+            self.normalisation_fit_B.append(y)   
 
-        self.flux_object_norm_A = (self.flux_object_A-self.dark_A)/((self.tungstenflat_A-self.darkflat_A)*normalisation_fit_A)
-        self.flux_object_norm_B = (self.flux_object_B-self.dark_B)/((self.tungstenflat_B-self.darkflat_B)*normalisation_fit_B)
+        self.flux_object_norm_A = (self.flux_object_A-self.dark_A)/((self.tungstenflat_A-self.darkflat_A)*self.normalisation_fit_A)
+        self.flux_object_norm_B = (self.flux_object_B-self.dark_B)/((self.tungstenflat_B-self.darkflat_B)*self.normalisation_fit_B)
 
         #fitfunctions absorption lines
         self.Mg_b1_A_wavelength = []
@@ -157,7 +157,7 @@ class orde_13():
 
         # calculate rotation period with Mg-b1
         for i in range(len(self.wavelength_object)):
-            if 5183.3 < self.wavelength_object[i] < 5184.0:
+            if 5183.27 < self.wavelength_object[i] < 5184.0:
                 self.Mg_b1_A_wavelength.append(self.wavelength_object[i])
                 Mg_b1_A_intensity.append(self.flux_object_norm_A[i])
                 Mg_b1_A_error.append(self.flux_object_norm_A[i]/self.SNR_A[i])
@@ -179,13 +179,13 @@ class orde_13():
 
         # calculate rotation period with Mg-b2
         for i in range(len(self.wavelength_object)):
-            if 5172.25 < self.wavelength_object[i] < 5173.18:
+            if 5172.33 < self.wavelength_object[i] < 5172.98:
                 self.Mg_b2_A_wavelength.append(self.wavelength_object[i])
                 Mg_b2_A_intensity.append(self.flux_object_norm_A[i])
                 Mg_b2_A_error.append(self.flux_object_norm_A[i]/self.SNR_A[i])
 
         for i in range(len(self.wavelength_object)):
-                if 5172.28 < self.wavelength_object[i] < 5173.2:
+                if 5172.36 < self.wavelength_object[i] < 5173.2:
                     self.Mg_b2_B_wavelength.append(self.wavelength_object[i])
                     Mg_b2_B_intensity.append(self.flux_object_norm_B[i])
                     Mg_b2_B_error.append(self.flux_object_norm_B[i]/self.SNR_B[i])
@@ -201,13 +201,13 @@ class orde_13():
 
         # calculate rotation period with Mg-b3
         for i in range(len(self.wavelength_object)):
-            if 5167.1 < self.wavelength_object[i] < 5167.75:
+            if 5167.1 < self.wavelength_object[i] < 5167.64:
                 self.Mg_b3_A_wavelength.append(self.wavelength_object[i])
                 Mg_b3_A_intensity.append(self.flux_object_norm_A[i])
                 Mg_b3_A_error.append(self.flux_object_norm_A[i]/self.SNR_A[i])
 
         for i in range(len(self.wavelength_object)): 
-                if 5167.03 < self.wavelength_object[i] < 5167.85: # de beginwaarde klopt niet of de guess positie p0 klopt niet
+                if 5167.03 < self.wavelength_object[i] < 5167.73:
                     self.Mg_b3_B_wavelength.append(self.wavelength_object[i])
                     Mg_b3_B_intensity.append(self.flux_object_norm_B[i])
                     Mg_b3_B_error.append(self.flux_object_norm_B[i]/self.SNR_B[i])
@@ -230,6 +230,8 @@ class orde_13():
 
         self.normal_distribution = normal_distribution
 
+        print(self.popt_b2_A[1], self.pcov_b2_A[1][1]**(1/2))
+        print(self.popt_b2_B[1], self.pcov_b2_B[1][1]**(1/2))
     def all_datasets_graph(self):
         #different absorption spectra with A
         plt.plot(self.x_pixelvalues_A,self.thar_A, label = 'ThAr')
@@ -301,11 +303,13 @@ class orde_13():
         # first order flux correction- not normalized:
 
         plt.plot(self.wavelength_object,(self.flux_object_A-self.dark_A)/(self.tungstenflat_A-self.darkflat_A))
+        plt.plot(self.wavelength_object, self.normalisation_fit_A)
         plt.title('Limb A') #verwijder voor verslag
         plt.ylim(0,)
         plt.show()
 
         plt.plot(self.wavelength_object,(self.flux_object_B-self.dark_B)/(self.tungstenflat_B-self.darkflat_B))
+        plt.plot(self.wavelength_object, self.normalisation_fit_B)
         plt.title('Limb B') # verwijder voor verslag
         plt.ylim(0,)
         plt.show()
@@ -319,8 +323,8 @@ class orde_13():
         '''
 
         #plot Mg b1
-        plt.plot(self.Mg_b1_A_wavelength, (self.normal_distribution(self.Mg_b1_A_wavelength, self.popt_b1_A[0], self.popt_b1_A[1], self.popt_b1_A[2])), label='Gaussische fitfunctie A mg b1')
-        plt.plot(self.Mg_b1_B_wavelength, (self.normal_distribution(self.Mg_b1_B_wavelength, self.popt_b1_B[0], self.popt_b1_B[1], self.popt_b1_B[2])), label='Gaussische fitfunctie B mg b1')
+        plt.plot(self.wavelength_object, (self.normal_distribution(self.wavelength_object, self.popt_b1_A[0], self.popt_b1_A[1], self.popt_b1_A[2])), label='Gaussische fitfunctie A mg b1')
+        plt.plot(self.wavelength_object, (self.normal_distribution(self.wavelength_object, self.popt_b1_B[0], self.popt_b1_B[1], self.popt_b1_B[2])), label='Gaussische fitfunctie B mg b1')
         #plot Mg b2
         plt.plot(self.Mg_b2_A_wavelength, (self.normal_distribution(self.Mg_b2_A_wavelength, self.popt_b2_A[0], self.popt_b2_A[1], self.popt_b2_A[2])), label='Gaussische fitfunctie A mg b2')
         plt.plot(self.Mg_b2_B_wavelength, (self.normal_distribution(self.Mg_b2_B_wavelength, self.popt_b2_B[0], self.popt_b2_B[1], self.popt_b2_B[2])), label='Gaussische fitfunctie B mg b2')

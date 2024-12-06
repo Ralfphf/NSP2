@@ -281,4 +281,6 @@ class orde_3():
 
 
         
-# %%
+if __name__ == '__main__':
+    model = orde_3()
+    model.fitted_spectrallines()

@@ -235,13 +235,13 @@ Na_D1_B_error = []
 
 # calculate rotation period with Mg-b1
 for i in range(len(wavelength_object)):
-    if 5889.65 < wavelength_object[i] < 5890.90:
+    if 5889.75 < wavelength_object[i] < 5890.75:
         Na_D1_A_wavelength.append(wavelength_object[i])
         Na_D1_A_intensity.append(flux_object_norm_A[i])
         Na_D1_A_error.append(flux_object_norm_A[i]/SNR_A[i])
 
 for i in range(len(wavelength_object)):
-        if 5889.75 < wavelength_object[i] < 5890.90:
+        if 5889.75 < wavelength_object[i] < 5890.75:
             Na_D1_B_wavelength.append(wavelength_object[i])
             Na_D1_B_intensity.append(flux_object_norm_B[i])
             Na_D1_B_error.append(flux_object_norm_B[i]/SNR_B[i])
@@ -250,7 +250,7 @@ for i in range(len(wavelength_object)):
 def normal_distribution(x, std, avg, c):
     return -(np.e**(-(((x-avg)/std)**2)/2))/(std*np.sqrt(2*np.pi))+c
 
-popt_n_A, pcov_n_A = curve_fit(normal_distribution, Na_D1_A_wavelength, Na_D1_A_intensity, p0=[1, 5890.25, 1], sigma=Na_D1_A_error)
+popt_n_A, pcov_n_A = curve_fit(normal_distribution, Na_D1_A_wavelength, Na_D1_A_intensity, p0=[1, 5890.20, 1], sigma=Na_D1_A_error)
 std_opt_A , avg_opt_A, c_opt_A= popt_n_A
 error_std_cov_A, error_avg_cov_A, error_c_cov_A = pcov_n_A
 print(f'minimum gaussische functie {avg_opt_A}')
@@ -364,13 +364,13 @@ Na_D2_B_error = []
 
 # calculate rotation period with Mg-b1
 for i in range(len(wavelength_object)):
-    if 5895.00 < wavelength_object[i] < 5897.30:
+    if 5895.70 < wavelength_object[i] <  5896.60:
         Na_D2_A_wavelength.append(wavelength_object[i])
         Na_D2_A_intensity.append(flux_object_norm_A[i])
         Na_D2_A_error.append(flux_object_norm_A[i]/SNR_A[i])
 
 for i in range(len(wavelength_object)):
-        if 5895.50 < wavelength_object[i] < 5897.50:
+        if 5895.70 < wavelength_object[i] <  5896.50:
             Na_D2_B_wavelength.append(wavelength_object[i])
             Na_D2_B_intensity.append(flux_object_norm_B[i])
             Na_D2_B_error.append(flux_object_norm_B[i]/SNR_B[i])
